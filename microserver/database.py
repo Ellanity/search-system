@@ -16,15 +16,27 @@ class Database:
         self.__loadDBInstructions()
         self.__start()
         
+    def __init_system_variables__(self):
+        # check variables
+        if not WORKING_DIRECTORY: 
+            raise Exception("Can not find variable WORKING_DIRECTORY")
+        if not DATABASE_URL: 
+            raise Exception("Can not find variable DATABASE_URL")
+        if not DB_INSTRUCTIONS_DIRECTORY_URL: 
+            raise Exception("Can not find variable DB_INSTRUCTIONS_DIRECTORY_URL")
+        
     def __del__(self, **kwargs):
         # stop database here
         self.__stop()
             
     # Database connection and cursor creation
     def __start(self):
-        self.__connection = self.__connect(DATABASE_URL)
-        self._cursor = self.__connection.cursor()
+        working_directory: str = WORKING_DIRECTORY if not None else os.getcwd()
+        current_path_db: str = os.path.join(working_directory, DATABASE_URL)
     
+        self.__connection = self.__connect(current_path_db)
+        self._cursor = self.__connection.cursor()
+        
     # Save db state and close connection
     def __stop(self):
         self.__connection.commit()
@@ -38,7 +50,9 @@ class Database:
         
     def __loadDBInstructions(self) -> None:
         # we run through all the files in the directory
-        current_path: str = os.path.join(os.getcwd(), DB_INSTRUCTIONS_DIRECTORY_URL)
+        
+        working_directory: str = WORKING_DIRECTORY if not None else os.getcwd()
+        current_path: str = os.path.join(working_directory, DB_INSTRUCTIONS_DIRECTORY_URL)
         for filename in os.listdir(current_path):
             filepath: str = os.path.join(current_path, filename)
             # checking if it is a file
@@ -76,6 +90,8 @@ class DatabaseDocuments(Database):
         self.get_document_all_last = self._excuteStandardInstruction("getDocumentAll")
         return self.get_document_all_last
     
+    def getTables(self):
+        return  self._excuteStandardInstruction("getTables")
     
     """
     # its not safe, but if you need it, you can uncomment it

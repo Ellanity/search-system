@@ -8,6 +8,7 @@ from variables import HTTP_PORT
 class App:
     
     def __init__(self):
+        # db
         self.database = DatabaseDocuments()
         
         # crawler
@@ -26,8 +27,8 @@ class App:
            return
         
         self.database.getDocumentAll()
-        self.crawler.setDocumentsFromDB(self.database.get_document_all_last)
-        self.crawler.start()
+        self.crawler.start(self.database.get_document_all_last)
+        
 
 if __name__ == "__main__":
     app = App()
