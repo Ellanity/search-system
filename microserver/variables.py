@@ -1,0 +1,11 @@
+# database
+DATABASE_URL="documents.db"
+DB_INSTRUCTIONS_DIRECTORY_URL="db_instructions"
+
+# crawler
+DOCUMENTS_DIRECTORY_URL="documents"
+SEARCH_IMAGES_DOCUMENTS_DIRECTORY_URL="search_images_documents"
+CRAWLER_TIMESPAN_SEC=600
+
+# http
+HTTP_PORT=49631
