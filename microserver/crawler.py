@@ -1,6 +1,6 @@
 from variables import *
 
-from time import time, strptime, mktime
+from time import time, strptime, mktime, strftime, gmtime
 import os
 import re
 import codecs
@@ -21,6 +21,7 @@ class WebСrawler:
 
     def __init__(self):
         # documents
+        self.__database = None
         self.__documets_from_db = []
         
         self.__documets_found_in_directory = []
@@ -44,6 +45,19 @@ class WebСrawler:
         self.__init_system_variables__()
         self.__init_server_dictionary__()
         
+        # states
+        self.possible_states = {
+            0:"wait", 
+            1:"indexing_files", 
+            2:"creating_search_images", 
+            3:"updating_server_dictionary", 
+            4:"work_with_database"
+        }
+        self.current_state = self.possible_states[0]
+        
+    def __update_state(self, state):
+        self.current_state = self.possible_states[state]
+    
     def __init_system_variables__(self):
         # check variables
         if not WORKING_DIRECTORY: 
@@ -100,16 +114,26 @@ class WebСrawler:
                 }
                 json.dump(common_info_init_data, server_dictionary_common_info_file)
         
-    def start(self, documets_from_db):
-        self.__documets_from_db = documets_from_db
+    def start(self, database):
         # if last_start is not empty and less time has passed than it set
         if self.__last_start != "" and (time() - self.__last_start) < CRAWLER_TIMESPAN_SEC:
             return 
         
+        self.__update_state(4)
+        self.__database = database
+        self.__documets_from_db = self.__database.getDocumentAll()
+        self.__update_state(0)
+        
         # work with docs 
+        self.__update_state(1)
         self.__documentCheck()
+        self.__update_state(2)
         self.__createSearchImagesOfDocuments()
+        self.__update_state(3)
         self.__indexingServerDictionary()
+        self.__update_state(4)
+        self.__commitDataInDatabase()
+        self.__update_state(0)
         
         # restart timer
         self.__last_start = time()
@@ -386,7 +410,7 @@ class WebСrawler:
         
         for part in server_dictionary_parts.keys():
             for lexem in server_dictionary_parts[part].keys():
-                if server_dictionary_parts[part][lexem]["documents_with_term"] != 0:
+                if server_dictionary_parts[part][lexem]["documents_with_term"] != 0 and count_of_documents != 0:
                     inverse_frequency_of_lexem = math.log((count_of_documents / server_dictionary_parts[part][lexem]["documents_with_term"])) 
                     server_dictionary_parts[part][lexem]["inverse_frequency"] = round(inverse_frequency_of_lexem, 10)
                     
@@ -415,3 +439,41 @@ class WebСrawler:
         for document in self.__documents_urls_to_readd:
             update_weights(document)
         
+    # ### WORK WITH DATABASE ### #
+    
+    def __commitDataInDatabase(self):
+        for document in self.__documents_urls_to_add:
+            self.__transactionDocumentSearchImageAdd(document)
+        for document in self.__documents_urls_to_readd:
+            self.__transactionDocumentSearchImageDelete(document)
+            self.__transactionDocumentSearchImageAdd(document)
+        for document in self.__documents_urls_to_delete:
+            self.__transactionDocumentSearchImageDelete(document)
+            
+    def __transactionDocumentSearchImageAdd(self, document_url):
+        # create record in db        
+        self.__database.addDocument(
+            url_document=(os.path.join(document_url)),
+            search_image_document=(os.path.join(SEARCH_IMAGES_DOCUMENTS_DIRECTORY_URL, document_url + ".json")),
+            last_update_document=strftime(TIME_FORMAT, gmtime()))
+            
+        # move json from temp to search images dir 
+        search_image_document = self.__getSearchImageDocument(document_url, temp=True)
+        self.__setSearchImageDocument(document_url, search_image_document, temp=False)
+        
+        # remove json from temp
+        try:
+            os.remove(os.path.join(self.__working_directory, SEARCH_IMAGES_DOCUMENTS_DIRECTORY_URL, "temp", document_url + ".json"))
+        except Exception as ex:
+            print(f"No such temp search image {document_url} | {ex}")
+        
+    def __transactionDocumentSearchImageDelete(self, document_url):
+        # delete record from db
+        self.__database.deleteDocument(url_document=document_url)
+        
+        # delete residual files
+        try:
+            os.remove(os.path.join(self.__working_directory, SEARCH_IMAGES_DOCUMENTS_DIRECTORY_URL, document_url + ".json"))
+        except Exception as ex:
+            print(f"No such search image {document_url} | {ex}")
+           

@@ -1,0 +1,1 @@
+DELETE FROM documents WHERE url_document={url_document};

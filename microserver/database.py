@@ -1,7 +1,8 @@
 import sqlite3
 import os
 from variables import *
- 
+from string import Formatter
+
 
 class Database:
 
@@ -60,16 +61,40 @@ class Database:
                 with open(filepath, "r") as file:
                     self._db_instructions[filename.split('.')[0]] = file.read()
                     
-    def _excuteStandardInstruction(self, instruction_name):
+    # formatter for instructions
+    class UnseenFormatter(Formatter):
+        def get_value(self, key, args, kwds):
+            if isinstance(key, str):
+                try:
+                    return kwds[key]
+                except KeyError:
+                    return key
+            else:
+                return Formatter.get_value(key, args, kwds)
+        
+    # check standart instructions and set kwargs to them
+    def _excuteStandardInstruction(self, instruction_name, **kwargs):
         try:
-            return self._cursor.execute(self._db_instructions.get(instruction_name)).fetchall()
+            if kwargs:
+                fmt = self.UnseenFormatter()
+                instruction = fmt.format(self._db_instructions.get(instruction_name), **kwargs)
+                # print(instruction)
+                response = self._cursor.execute(instruction)
+                self.__connection.commit()
+                return response.fetchall()
+            else:
+                response = self._cursor.execute(self._db_instructions.get(instruction_name))
+                self.__connection.commit()
+                return response.fetchall()
         except Exception as ex:
             print("Instruction can not be run: ", ex)
         return None
             
-    def _excuteExternalInstruction(self, instruction):
+    def _excuteExternalInstruction(self, instruction, **kwargs):
         try:
-            return self._cursor.execute(instruction).fetchall()
+            response = self._cursor.execute(instruction)
+            self.__connection.commit()
+            return response.fetchall()
         except Exception as ex:
             print("Instruction can not be run: ", ex)
         return None
@@ -91,7 +116,22 @@ class DatabaseDocuments(Database):
         return self.get_document_all_last
     
     def getTables(self):
-        return  self._excuteStandardInstruction("getTables")
+        return self._excuteStandardInstruction("getTables")
+        
+    def addDocument(self, url_document, search_image_document, last_update_document):
+        # print (f"--- add ---\nurl_document: {url_document} \nsearch_image_document: {search_image_document} \nlast_update_document: {last_update_document}")
+        return self._excuteStandardInstruction(
+            instruction_name="addDocument", 
+            url_document=f'"{url_document}"', 
+            search_image_document=f'"{search_image_document}"', 
+            last_update_document=f'"{last_update_document}"')
+        
+    def deleteDocument(self, url_document):
+        # print (f"--- delete ---\nurl_document: {url_document}")
+        return self._excuteStandardInstruction(
+            instruction_name="deleteDocument", 
+            url_document=f'"{url_document}"')
+        
     
     """
     # its not safe, but if you need it, you can uncomment it
