@@ -31,10 +31,9 @@ class WebСrawler:
         self.__findDocumentsInDirectory()
         self.__checkFoundDocuments()
         self.__convertNewDocumentsToDatabaseFormat()
-        self.__addDocumentsToDatabase()
-        self.__deleteDocumentsFromDatabase()
-        # print(self.documents_to_add)
-
+        # self.__addDocumentsToDatabase()
+        # self.__deleteDocumentsFromDatabase()
+        
         self.last_start = time()
 
     
@@ -46,11 +45,8 @@ class WebСrawler:
             # checking if it is a file
             if os.path.isfile(filepath):
                 filepath_for_db: str = os.path.join(DOCUMENTS_DIRECTORY_URL, filename)
-                # if 
                 self.documets_found_in_directory.append(filepath_for_db)
                 
-                # with open(filepath, "r") as file:
-                #     self._db_instructions[filename.split('.')[0]] = file.read()
                 
     def __checkFoundDocuments(self):
         documets_from_db_set = set(item[0] for item in self.__documets_from_db)
@@ -80,6 +76,6 @@ class WebСrawler:
         # make transaction for table record and file 
         # add new files 
  
-    def __deleteDocumentsFromDatabase(self, database_cursor): pass
+    def deleteDocumentsFromDatabase(self, database_cursor): pass
         # delete old files from database
     
