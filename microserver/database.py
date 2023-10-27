@@ -125,6 +125,14 @@ class DatabaseDocuments(Database):
             url_document=f'"{url_document}"', 
             search_image_document=f'"{search_image_document}"', 
             last_update_document=f'"{last_update_document}"')
+            
+    def updateDocument(self, url_document, search_image_document, last_update_document):
+        # print (f"--- update ---\nurl_document: {url_document} \nsearch_image_document: {search_image_document} \nlast_update_document: {last_update_document}")
+        return self._excuteStandardInstruction(
+            instruction_name="updateDocument", 
+            url_document=f'"{url_document}"', 
+            search_image_document=f'"{search_image_document}"', 
+            last_update_document=f'"{last_update_document}"')
         
     def deleteDocument(self, url_document):
         # print (f"--- delete ---\nurl_document: {url_document}")

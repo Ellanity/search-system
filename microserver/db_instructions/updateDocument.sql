@@ -1,0 +1,1 @@
+UPDATE documents SET search_image_document={search_image_document}, last_update_document={last_update_document} WHERE url_document={url_document};

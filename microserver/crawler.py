@@ -1,6 +1,7 @@
 from variables import *
 
-from time import time, strptime, mktime, strftime, gmtime
+from time import time, strptime, mktime, strftime # , gmtime
+from datetime import datetime
 import os
 import re
 import codecs
@@ -113,7 +114,24 @@ class WebСrawler:
                     "count_of_documents": 0,
                 }
                 json.dump(common_info_init_data, server_dictionary_common_info_file)
+       
+    def __reinit_variables__(self):
+        # documents
+        self.__documets_from_db = []
+        self.__documets_found_in_directory = []
         
+        self.__documents_urls_to_add = []
+        self.__documents_urls_to_readd = []
+        self.__documents_urls_to_delete = []
+        
+        # server dict
+        
+        # NEED TO REWORK IT, SAVE IN JSON IN COMMON DATA
+        self.__written_in_dictionary = []
+        self.__deleted_from_dictionary = []
+        
+        self.current_state = self.possible_states[0]
+       
     def start(self, database):
         # if last_start is not empty and less time has passed than it set
         if self.__last_start != "" and (time() - self.__last_start) < CRAWLER_TIMESPAN_SEC:
@@ -135,6 +153,8 @@ class WebСrawler:
         self.__commitDataInDatabase()
         self.__update_state(0)
         
+        self.__reinit_variables__()
+
         # restart timer
         self.__last_start = time()
         
@@ -284,7 +304,7 @@ class WebСrawler:
     def __setServerDictionaryCommonInfo(self, common_info):   
         with open(self.__server_dictionary_common_info_path, "w", encoding="utf-8") as common_info_file:
             json.dump(common_info, common_info_file)
-       
+            
     # server dictionary get
     def __getServerDictionaryParts(self):
         server_dictionary_parts = {} # TAKES REALLY A LOT OF RAM, but this solution faster then other (load in query for ex)
@@ -388,7 +408,7 @@ class WebСrawler:
                 
             common_info["count_of_words"] = max(common_info["count_of_words"] - search_image_document["dict_of_lexems"][lexem]["count"], 0)
 
-        common_info["count_of_documents"] -= 1
+        common_info["count_of_documents"] = max(common_info["count_of_documents"] - 1, 0)
         
         # save full dictionary
         self.__setServerDictionaryParts(server_dictionary_parts)
@@ -444,18 +464,26 @@ class WebСrawler:
     def __commitDataInDatabase(self):
         for document in self.__documents_urls_to_add:
             self.__transactionDocumentSearchImageAdd(document)
+            
         for document in self.__documents_urls_to_readd:
             self.__transactionDocumentSearchImageDelete(document)
             self.__transactionDocumentSearchImageAdd(document)
+        
         for document in self.__documents_urls_to_delete:
             self.__transactionDocumentSearchImageDelete(document)
             
     def __transactionDocumentSearchImageAdd(self, document_url):
         # create record in db        
+        time_structure = datetime.now()
         self.__database.addDocument(
             url_document=(os.path.join(document_url)),
             search_image_document=(os.path.join(SEARCH_IMAGES_DOCUMENTS_DIRECTORY_URL, document_url + ".json")),
-            last_update_document=strftime(TIME_FORMAT, gmtime()))
+            last_update_document=time_structure.strftime(TIME_FORMAT))
+        
+        self.__database.updateDocument(
+            url_document=(os.path.join(document_url)),
+            search_image_document=(os.path.join(SEARCH_IMAGES_DOCUMENTS_DIRECTORY_URL, document_url + ".json")),
+            last_update_document=time_structure.strftime(TIME_FORMAT))
             
         # move json from temp to search images dir 
         search_image_document = self.__getSearchImageDocument(document_url, temp=True)
@@ -465,7 +493,7 @@ class WebСrawler:
         try:
             os.remove(os.path.join(self.__working_directory, SEARCH_IMAGES_DOCUMENTS_DIRECTORY_URL, "temp", document_url + ".json"))
         except Exception as ex:
-            print(f"No such temp search image {document_url} | {ex}")
+            print(f"__transactionDocumentSearchImageAdd | No such temp search image {document_url} | {ex}")
         
     def __transactionDocumentSearchImageDelete(self, document_url):
         # delete record from db
@@ -475,5 +503,5 @@ class WebСrawler:
         try:
             os.remove(os.path.join(self.__working_directory, SEARCH_IMAGES_DOCUMENTS_DIRECTORY_URL, document_url + ".json"))
         except Exception as ex:
-            print(f"No such search image {document_url} | {ex}")
+            print(f"__transactionDocumentSearchImageDelete | No such search image {document_url} | {ex}")
            
