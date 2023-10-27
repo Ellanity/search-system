@@ -1,9 +1,8 @@
 from database import DatabaseDocuments
 from crawler import WebСrawler
-from variables import HTTP_PORT
 
+from variables import SERVER_ADDRESS, CRAWLER_TIMESPAN_SEC
 
-import asyncio
 
 class App:
     
@@ -11,44 +10,80 @@ class App:
         self.database = DatabaseDocuments()
         self.crawler = WebСrawler()
         
+    def run(self):
+        self.crawlerRun()
+        
     def crawlerRun(self):
         if self.crawler.current_state == "wait":
             self.crawler.start(self.database)
-        
+
+"""        
 if __name__ == "__main__":
     app = App()
     app.crawlerRun()
 
 """        
-from http.server import BaseHTTPRequestHandler, HTTPServer
 
+import http.server
+import socketserver
+import urllib.parse
+import asyncio
 
-class HttpHandler(BaseHTTPRequestHandler):
-
-    def __init__(self, **kwargs):
-        super().__init__()
-        self.app = App()
-
+# Define the custom handler for the search request
+class SearchHandler(http.server.BaseHTTPRequestHandler):
+    def __init__(self, *args, app=None, **kwargs):
+        self.__app = app
+        super().__init__(*args, **kwargs)
+    
     def do_GET(self):
-        
-        self.send_response(200)
-        self.send_header("Content-type", "application/json")
-        self.end_headers()
-        
-        json_dumped: str = json.dumps({"urls":"lol"}, indent = 4)
-        
-        self.wfile.write(json_dumped.encode())
+        if self.path.startswith('/search?request_content='):
+            parsed_url = urllib.parse.urlparse(self.path)
+            query_params = urllib.parse.parse_qs(parsed_url.query)
+            if 'request_content' in query_params:
+                search_text = query_params['request_content'][0]
+                result = self.perform_search(search_text)
+                self.send_response(200)
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write(result.encode('utf-8'))
+            else:
+                self.send_error(400, 'Bad Request')
+        else:
+            super().do_GET()
 
+    def perform_search(self, search_text):
+        print(app.crawler.current_state)
+        # Implement your search logic here, for example:
+        # search_result = search_function(search_text)
+        search_result = f"Searching for: {search_text}\nThis is a placeholder for search results."
+        return search_result
 
-def run(server_class=HTTPServer, handler_class=HttpHandler):
+# Define a crawler coroutine that runs every 10 minutes
+async def runCrawler(app: App):
+    while True:
+        # Replace this with your crawler logic
+        print("Crawler is running...")
+        app.run()
+        print("Crawler done...")
+        await asyncio.sleep(CRAWLER_TIMESPAN_SEC)  # Wait for timespan 
     
-    server_address = ('', HTTP_PORT)
-    httpd = server_class(server_address, handler_class)
-    
+
+def main():
+    mainApp = App()
+    # Create an HTTP server for handling search requests
+    search_server = socketserver.TCPServer(SERVER_ADDRESS, lambda *args, **kwargs: SearchHandler(*args, app=mainApp, **kwargs))
+    # Serving checkpoint 
+    print(f'Serving on {SERVER_ADDRESS}')
+ 
     try:
-        httpd.serve_forever()    
+        # Start the crawler as an asynchronous background task
+        # loop = asyncio.get_event_loop()
+        asyncio.run(runCrawler(mainApp))
+        # Start serving both file requests and search requests
+        search_server.serve_forever()
     except KeyboardInterrupt:
-        httpd.server_close()
-
-run()
-"""
+        # loop.stop()
+        search_server.shutdown()
+        
+if __name__ == "__main__":
+    main()
