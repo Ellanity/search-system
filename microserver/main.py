@@ -1,7 +1,7 @@
 from database import DatabaseDocuments
 from crawler import WebСrawler
 
-from variables import SERVER_ADDRESS, CRAWLER_TIMESPAN_SEC
+from variables import SERVER_ADDRESS, CRAWLER_TIMESPAN_SEC, WORKING_DIRECTORY, DOCUMENTS_DIRECTORY_URL
 
 
 class App:
@@ -28,14 +28,17 @@ import http.server
 import socketserver
 import urllib.parse
 import asyncio
+import threading
 
 # Define the custom handler for the search request
-class SearchHandler(http.server.BaseHTTPRequestHandler):
+# class SearchHandler(http.server.BaseHTTPRequestHandler):
+class SearchHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, app=None, **kwargs):
         self.__app = app
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, directory=WORKING_DIRECTORY, **kwargs)
     
     def do_GET(self):
+        # Search
         if self.path.startswith('/search?request_content='):
             parsed_url = urllib.parse.urlparse(self.path)
             query_params = urllib.parse.parse_qs(parsed_url.query)
@@ -48,11 +51,14 @@ class SearchHandler(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(result.encode('utf-8'))
             else:
                 self.send_error(400, 'Bad Request')
+        # Documents
+        elif self.path.startswith(f'/{DOCUMENTS_DIRECTORY_URL}/'):
+            super().do_GET()    
         else:
-            super().do_GET()
+            self.send_error(400, 'Bad Request')
 
     def perform_search(self, search_text):
-        print(app.crawler.current_state)
+        print(self.__app.crawler.current_state)
         # Implement your search logic here, for example:
         # search_result = search_function(search_text)
         search_result = f"Searching for: {search_text}\nThis is a placeholder for search results."
@@ -74,16 +80,28 @@ def main():
     search_server = socketserver.TCPServer(SERVER_ADDRESS, lambda *args, **kwargs: SearchHandler(*args, app=mainApp, **kwargs))
     # Serving checkpoint 
     print(f'Serving on {SERVER_ADDRESS}')
- 
+    
     try:
         # Start the crawler as an asynchronous background task
         # loop = asyncio.get_event_loop()
-        asyncio.run(runCrawler(mainApp))
+        # asyncio.run(runCrawler(mainApp))
         # Start serving both file requests and search requests
         search_server.serve_forever()
     except KeyboardInterrupt:
         # loop.stop()
         search_server.shutdown()
-        
+    """
+
+    try:
+        # Create a thread for the crawler and start it
+        crawler_thread = threading.Thread(target=asyncio.run, args=(runCrawler(mainApp),))
+        crawler_thread.start()
+
+        # Start the server
+        search_server.serve_forever()
+    except KeyboardInterrupt:
+        search_server.shutdown()
+    """
+    
 if __name__ == "__main__":
     main()

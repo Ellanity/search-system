@@ -17,6 +17,6 @@ ALLOWED_DICTIONARY="ёйцукенгшщзхъфывапролджэячсмит
 SERVER_DICTIONARY_DIRECTORY_URL="server_dictionary"
 
 # http
-HTTP_PORT=8080
-HOST="localhost"
+HTTP_PORT=3000
+HOST="0.0.0.0"
 SERVER_ADDRESS = (HOST, HTTP_PORT)
