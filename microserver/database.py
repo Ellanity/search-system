@@ -15,7 +15,8 @@ class Database:
         
         # start database here
         self.__loadDBInstructions()
-        self.__start()
+        
+        # self.__start()
         
     def __init_system_variables__(self):
         # check variables
@@ -40,9 +41,16 @@ class Database:
         
     # Save db state and close connection
     def __stop(self):
-        self.__connection.commit()
-        self.__connection.close()
-    
+        try:
+            self.__connection.commit()
+        except Exception as ex:
+            pass
+        
+        try:
+            self.__connection.close()
+        except Exception as ex:
+            pass
+        
     # Here you can change the database type
     # if you do, make sure you also changed
     # the instructions in db_instructions
@@ -75,28 +83,43 @@ class Database:
     # check standart instructions and set kwargs to them
     def _excuteStandardInstruction(self, instruction_name, **kwargs):
         try:
+            self.__start()
             if kwargs:
                 fmt = self.UnseenFormatter()
                 instruction = fmt.format(self._db_instructions.get(instruction_name), **kwargs)
                 # print(instruction)
                 response = self._cursor.execute(instruction)
                 self.__connection.commit()
-                return response.fetchall()
+                
+                response = response.fetchall()
+                self.__stop()
+                return response
             else:
                 response = self._cursor.execute(self._db_instructions.get(instruction_name))
                 self.__connection.commit()
-                return response.fetchall()
+                
+                response = response.fetchall()
+                self.__stop()
+                return response
         except Exception as ex:
             print("Instruction can not be run: ", ex)
+        
+        self.__stop()
         return None
             
     def _excuteExternalInstruction(self, instruction, **kwargs):
         try:
+            self.__start()
             response = self._cursor.execute(instruction)
             self.__connection.commit()
-            return response.fetchall()
+            
+            response = response.fetchall()
+            self.__stop()
+            return response
         except Exception as ex:
             print("Instruction can not be run: ", ex)
+            
+        self.__stop()
         return None
 
 class DatabaseDocuments(Database):

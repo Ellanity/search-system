@@ -1,4 +1,4 @@
-from database import DatabaseDocuments
+# from database import DatabaseDocuments
 from crawler import WebСrawler
 from searcher import Searcher
 
@@ -13,18 +13,20 @@ import asyncio
 class App:
     
     def __init__(self):
-        self.database = DatabaseDocuments()
+        # self.database = DatabaseDocuments()
         self.crawler = WebСrawler()
         self.searcher = Searcher()
                 
     def crawlerRun(self):
         if self.crawler.current_state == "wait":
-            self.crawler.start(self.database)
+            self.crawler.start()
+            # self.crawler.start(self.database)
 
     def searcherRun(self, request_content):
         result = ""
-        if self.crawler.current_state != "work_with_database":
+        if self.crawler.current_state == "wait":
             result = self.searcher.search(request_content)
+            # result = self.searcher.search(request_content, self.database)
         return result
 
 # Define the custom handler for the search request
@@ -35,30 +37,34 @@ class SearchHandler(http.server.SimpleHTTPRequestHandler):
     
     def do_GET(self):
         # search api endpoint
-        if self.path.startswith('/search?request_content='):
+        if self.path.startswith("/search?request_content="):
             parsed_url = urllib.parse.urlparse(self.path)
             query_params = urllib.parse.parse_qs(parsed_url.query)
-            if 'request_content' in query_params:
-                request_content = query_params['request_content'][0]
+            
+            if "request_content" in query_params:
+                request_content = query_params["request_content"][0]
                 result = self.perform_search(request_content)
+                # everything is bad
+                if result == "" or result == None:
+                    self.send_error(503, "Service Unavailable")
+                # everything ok
                 self.send_response(200)
-                # self.send_header('Content-type', 'text/plain')
-                self.send_header('Content-type', 'application/json')
+                self.send_header("Content-type", "application/json")
                 self.end_headers()
-                self.wfile.write(result.encode('utf-8'))
+                self.wfile.write(result.encode("utf-8"))
             else:
-                self.send_error(400, 'Bad Request')
+                self.send_error(400, "Bad Request")
+        
         # documents api endpoint
         elif self.path.startswith(f'/{DOCUMENTS_DIRECTORY_URL}/'):
             super().do_GET()    
         else:
-            self.send_error(400, 'Bad Request')
+            self.send_error(404, "Not found")
 
     # search logic:
     def perform_search(self, request_content):
-        self.send_response(200)
         return self.__app.searcherRun(request_content)
-
+        
 # Define a crawler coroutine that runs every 10 minutes
 async def runCrawler(app: App):
     while True:

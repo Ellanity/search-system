@@ -8,3 +8,4 @@ documents/
 
 # trash directories 
 __pycache__/
+.trash/

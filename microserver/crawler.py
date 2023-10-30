@@ -1,3 +1,4 @@
+from database import DatabaseDocuments
 from variables import *
 
 from time import time, strptime, mktime, strftime # , gmtime
@@ -22,7 +23,7 @@ class WebСrawler:
 
     def __init__(self):
         # documents
-        self.__database = None
+        self.__database = DatabaseDocuments()
         self.__documets_from_db = []
         
         self.__documets_found_in_directory = []
@@ -73,6 +74,8 @@ class WebСrawler:
             raise Exception("Can not find variable CRAWLER_DOCUMENTS_READD_TIMESPAN_SEC")
         if not ALLOWED_DICTIONARY: 
             raise Exception("Can not find variable ALLOWED_DICTIONARY")
+        if not DELIMETERS_OF_TEXT: 
+            raise Exception("Can not find variable DELIMETERS_OF_TEXT")
         if not CRAWLER_TIMESPAN_SEC: 
             raise Exception("Can not find variable CRAWLER_TIMESPAN_SEC")
         if not SERVER_DICTIONARY_DIRECTORY_URL: 
@@ -132,13 +135,12 @@ class WebСrawler:
         
         self.current_state = self.possible_states[0]
        
-    def start(self, database):
+    def start(self):
         # if last_start is not empty and less time has passed than it set
         if self.__last_start != "" and (time() - self.__last_start) < CRAWLER_TIMESPAN_SEC:
             return 
         
         self.__update_state(4)
-        self.__database = database
         self.__documets_from_db = self.__database.getDocumentAll()
         self.__update_state(0)
         
@@ -177,7 +179,7 @@ class WebСrawler:
     # classificate documents to add, readd or delete
     def __classificationOfFoundDocuments(self):
         if self.__documets_from_db != []:
-            documets_from_db_set = set(item[0] for item in self.__documets_from_db)
+            documets_from_db_set = set(documemt_record_in_db[0] for documemt_record_in_db in self.__documets_from_db)
         else:
             documets_from_db_set = set()
             
@@ -227,14 +229,16 @@ class WebСrawler:
             reference_string=ALLOWED_DICTIONARY)
             
         # split text by spaces and getting words with counts
-        list_of_lexems = text_from_document.split(' ')
-        list_of_lexems = [item for item in list_of_lexems if item != ""]
+        # list_of_lexems = re.split(DELIMETERS_OF_TEXT, text_from_document, flags=re.IGNORECASE)
+        # list_of_lexems = [lexem for lexem in list_of_lexems if lexem != ""]
+        list_of_lexems = re.sub(r'(?:(?!\u0301)[\W\d_])+', ' ', ("".join(character for character in text_from_document if character in ALLOWED_DICTIONARY)))
+        list_of_lexems = [lexem for lexem in list_of_lexems.split(" ") if lexem != ""]
         
         dict_of_lexems = {
-            item: {
-                "count": list_of_lexems.count(item), 
+            lexem: {
+                "count": list_of_lexems.count(lexem), 
                 "weight": 0
-            } for item in list_of_lexems
+            } for lexem in list_of_lexems
         }
         
         search_image_document = {
@@ -307,25 +311,40 @@ class WebСrawler:
             
     # server dictionary get
     def __getServerDictionaryParts(self):
+        """
         server_dictionary_parts = {} # TAKES REALLY A LOT OF RAM, but this solution faster then other (load in query for ex)
         char_paths = [
             os.path.join(self.__working_directory, SERVER_DICTIONARY_DIRECTORY_URL, char + ".json") for char in ALLOWED_DICTIONARY
         ]
+        
         for char_path in char_paths:
             with open(char_path, "r", encoding="utf-8") as server_dictionary_part_file:
                 json_content = server_dictionary_part_file.read()
                 server_dictionary_parts[char_path] = json.loads(json_content)
+        """
+        server_dictionary_parts = {}
+        for char in ALLOWED_DICTIONARY:
+            char_path = os.path.join(self.__working_directory, SERVER_DICTIONARY_DIRECTORY_URL, char + ".json")
+            with open(char_path, "r", encoding="utf-8") as server_dictionary_part_file:
+                json_content = server_dictionary_part_file.read()
+                server_dictionary_parts[f"{char}.json"] = json.loads(json_content)
                 
         return server_dictionary_parts
         
     # server dictionary set
     def __setServerDictionaryParts(self, server_dictionary_parts):   
+        """
         char_paths = [
             os.path.join(self.__working_directory, SERVER_DICTIONARY_DIRECTORY_URL, char + ".json") for char in ALLOWED_DICTIONARY
         ]
         for char_path in char_paths:
             with open(char_path, "w", encoding="utf-8") as server_dictionary_part_file:
                 json.dump(server_dictionary_parts[char_path], server_dictionary_part_file)
+        """        
+        for char in ALLOWED_DICTIONARY:
+            char_path = os.path.join(self.__working_directory, SERVER_DICTIONARY_DIRECTORY_URL, char + ".json")
+            with open(char_path, "w", encoding="utf-8") as server_dictionary_part_file:
+                json.dump(server_dictionary_parts[f"{char}.json"], server_dictionary_part_file)
         
     # write lexems in dict
     def __writeLexemsFromTempSearchImageInServerDictionary(self, document_url):
@@ -348,7 +367,7 @@ class WebСrawler:
         for lexem in search_image_document["dict_of_lexems"].keys():
             # getting part of dict by first char
             char = lexem[0]
-            current_server_dictionary_part = os.path.join(self.__working_directory, SERVER_DICTIONARY_DIRECTORY_URL, char + ".json")
+            current_server_dictionary_part = char + ".json" #os.path.join(self.__working_directory, SERVER_DICTIONARY_DIRECTORY_URL, char + ".json")
             # make structure for this word
             if lexem is " " or lexem is "":
                 continue
@@ -396,7 +415,7 @@ class WebСrawler:
         for lexem in search_image_document["dict_of_lexems"].keys():
             # getting part of dict by first char
             char = lexem[0]
-            current_server_dictionary_part = os.path.join(self.__working_directory, SERVER_DICTIONARY_DIRECTORY_URL, char + ".json")
+            current_server_dictionary_part = char + ".json" #os.path.join(self.__working_directory, SERVER_DICTIONARY_DIRECTORY_URL, char + ".json")
             # make structure for this word
             if lexem is " " or lexem is "":
                 continue
@@ -419,6 +438,7 @@ class WebСrawler:
         # mark, that file added to dictionary
         self.__written_in_dictionary.append(document_url)
         
+    # https://ru.wikipedia.org/wiki/TF-IDF
     def __recalculateInverseFrequencyOfLexemsInServerDictionary(self): 
         # common info file
         common_info = self.__getServerDictionaryCommonInfo()
@@ -431,6 +451,7 @@ class WebСrawler:
         for part in server_dictionary_parts.keys():
             for lexem in server_dictionary_parts[part].keys():
                 if server_dictionary_parts[part][lexem]["documents_with_term"] != 0 and count_of_documents != 0:
+                    #idf
                     inverse_frequency_of_lexem = math.log((count_of_documents / server_dictionary_parts[part][lexem]["documents_with_term"])) 
                     server_dictionary_parts[part][lexem]["inverse_frequency"] = round(inverse_frequency_of_lexem, 10)
                     
@@ -447,10 +468,20 @@ class WebСrawler:
             search_image_document = self.__getSearchImageDocument(document_url, temp=True)
             if search_image_document == {}:
                 return
+                
+            print(document_url)
+            # load full dictionary
+            server_dictionary_parts = self.__getServerDictionaryParts()
+                
             for lexem in search_image_document["dict_of_lexems"].keys():
+                # count of all words, can not be zero
                 search_image_document["count_of_words"] = max(search_image_document["count_of_words"], 1)
-                search_image_document["dict_of_lexems"][lexem]["weight"] = \
-                round((search_image_document["dict_of_lexems"][lexem]["count"] / search_image_document["count_of_words"]), 10)
+                # frequency of the term in the document
+                # tf
+                frequency = round((search_image_document["dict_of_lexems"][lexem]["count"] / search_image_document["count_of_words"]), 10)
+                # tf * idf
+                search_image_document["dict_of_lexems"][lexem]["weight"] = round(frequency * server_dictionary_parts[f"{lexem[0]}.json"][lexem]["inverse_frequency"], 10)
+                
             self.__setSearchImageDocument(document_url, search_image_document, temp=True)
         
         for document in self.__documents_urls_to_add:
