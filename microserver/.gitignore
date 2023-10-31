@@ -4,7 +4,9 @@ documents.db-journal
 
 # project directories
 server_dictionary/
-documents/
+# documents/
+temp/
+search_images_documents/
 
 # trash directories 
 __pycache__/
