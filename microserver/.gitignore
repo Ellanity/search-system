@@ -1,10 +1,10 @@
 # database 
-documents.db
+# documents.db
 documents.db-journal
 
 # project directories
-server_dictionary/
-documents/
+# server_dictionary/
+# documents/
 
 # trash directories 
 __pycache__/

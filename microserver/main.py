@@ -36,6 +36,12 @@ class SearchHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=WORKING_DIRECTORY, **kwargs)
     
     def do_GET(self):
+        """
+        def load_binary(filename):
+            with open(filename, 'rb') as file_handle:
+                return file_handle.read()
+        """
+        
         # search api endpoint
         if self.path.startswith("/search?request_content="):
             parsed_url = urllib.parse.urlparse(self.path)
@@ -56,8 +62,16 @@ class SearchHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_error(400, "Bad Request")
         
         # documents api endpoint
-        elif self.path.startswith(f'/{DOCUMENTS_DIRECTORY_URL}/'):
+        elif self.path.startswith(f"/{DOCUMENTS_DIRECTORY_URL}/"):
             super().do_GET()    
+            """
+            # favicon api endpoint
+            elif self.path == "/favicon.ico":
+                self.send_response(200)
+                self.send_header("Content-type", "image/x-icon")
+                self.end_headers()
+                self.wfile.write(load_binary("/favicon.icon"))
+            """
         else:
             self.send_error(404, "Not found")
 
