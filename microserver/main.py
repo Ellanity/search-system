@@ -77,7 +77,7 @@ class SearchHandler(http.server.SimpleHTTPRequestHandler):
 
     # search logic:
     def perform_search(self, request_content):
-        return self.__app.searcherRun(request_content)
+        return self.__app.searcherRun(request_content.lower())
         
 # Define a crawler coroutine that runs every 10 minutes
 async def runCrawler(app: App):

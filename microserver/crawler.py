@@ -232,7 +232,7 @@ class WebСrawler:
         # list_of_lexems = re.split(DELIMETERS_OF_TEXT, text_from_document, flags=re.IGNORECASE)
         # list_of_lexems = [lexem for lexem in list_of_lexems if lexem != ""]
         list_of_lexems = re.sub(r'(?:(?!\u0301)[\W\d_])+', ' ', ("".join(character for character in text_from_document if character in ALLOWED_DICTIONARY)))
-        list_of_lexems = [lexem for lexem in list_of_lexems.split(" ") if lexem != ""]
+        list_of_lexems = [lexem for lexem in list_of_lexems.split(" ") if len(lexem) > 2]
         
         dict_of_lexems = {
             lexem: {
