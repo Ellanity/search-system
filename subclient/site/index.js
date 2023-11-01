@@ -68,10 +68,18 @@ function makeCardsFromResponsData() {
 						`<a href="` + document_url + `" class="card-link" target="_blank">` + document_id + ". " + docname_short + `</a>` + 
 					`</h5>` + 
 					`<p class="card-text" style="margin: 0.4vh;"> Слова: ` + words_in_document.join(', ') + `</p>` + 
-					`<p class="card-text" style="margin: 0.4vh 1vw;"> > Совпадение: ` + similarity + `% ` + `</p>` +
-					`<p class="card-text" style="margin: 0.4vh 1vw;">` +
-						`> Результат является релевантным: <input class="relevant_checkbox" id="checkbox_` + docname_short + `" type="checkbox">` + 
-					`</p>` +
+					`<p class="card-text" style="margin: 0.4vh 1vw;"> > Совпадение: ` + similarity + `% ` + `</p>`
+					if (similarity >= 50) {
+						html += `<p class="card-text" style="margin: 0.4vh 1vw;">` +
+							`> Результат является релевантным: <input class="relevant_checkbox" id="checkbox_` + docname_short + `" type="checkbox" checked>` + 
+						`</p>`
+					}
+					else {
+						html += `<p class="card-text" style="margin: 0.4vh 1vw;">` +
+							`> Результат является релевантным: <input class="relevant_checkbox" id="checkbox_` + docname_short + `" type="checkbox">` + 
+						`</p>`
+					}
+				html +=
 				`</div>` +
 			`</div>`
 		cards.push(html)
@@ -102,25 +110,20 @@ function metrics(relevant_count_in_db=-1) {
 		return;
 	}
 	
-	let relevant_documents = []
+	let relevant_documents = new Map()
 	for (const [num_in_queue, document_in_list] of Object.entries(main_store.documents)) {
-		// id 
-		// document_id = (parseInt(num_in_queue) + 1).toString()
-		// docname
 		let docname_full = document_in_list.document.replaceAll('\\', '/')
 		let docname_short = docname_full.split('/').pop().replaceAll(' ', '_')
-		
 		let checkbox_relevant = document.getElementById("checkbox_" + docname_short)
-
-		if (checkbox_relevant.checked) {relevant_documents.push({num_in_queue: document_in_list})}
+		if (checkbox_relevant.checked) {relevant_documents.set(num_in_queue, document_in_list)}
 	}
 	
 	// console.log(relevant_documents)
 	
 	// calculate metrics 
 	let count = main_store.documents.length
-	let unrelevant_count = main_store.documents.length - relevant_documents.length
-	let relevant_count = relevant_documents.length
+	let relevant_count = relevant_documents.size
+	let unrelevant_count = count - relevant_count
 	
 	let recall = relevant_count / Math.max(relevant_count_in_db, 1)
 	let precision_request = relevant_count / Math.max(count, 1)
@@ -132,11 +135,9 @@ function metrics(relevant_count_in_db=-1) {
 	let n_precision = 0
 	let r_precision = 0
 	
-	// let precisions = new Array(Math.max(n, count)).fill(0);
-	let precisions_sum = 0
-	
-	for (const [num_in_queue, document_in_list] of Object.entries(relevant_documents)) {
-		
+	let precisions_sum = 0	
+
+	for (const [num_in_queue, document_in_list] of relevant_documents) {		
 		let num_in_queue_id = parseInt(num_in_queue)
 		if (num_in_queue_id + 1 <= n)
 			n_precision += 1;		
@@ -146,7 +147,6 @@ function metrics(relevant_count_in_db=-1) {
 		
 		precision += 1
 		precisions_sum += (precision / Math.max((num_in_queue_id + 1), 1))
-		// precisions[num_in_queue] = precision / Math.max(num_in_queue, 1) 
 	}
 	
 	n_precision /= Math.max(n, 1)
@@ -180,31 +180,32 @@ function metrics(relevant_count_in_db=-1) {
 				
 				if (!relevant_count_in_db || relevant_count_in_db < relevant_count) {
 					html += 
-					`<p id="metrics_10" class="card-text" style="margin: 0.4vh;"> Средняя точность [average precision]: ` + "Не хватает ифнормации" + `</p>`
+					`<p id="metrics_10" class="card-text" style="margin: 0.4vh;"> Средняя точность [average precision]: ` + "Не хватает информации" + `</p>`
 				}
 				else {
 					html += 
-					`<p id="metrics_10" class="card-text" style="margin: 0.4vh;"> Средняя точность [average precision]: ` + average_precision.toFixed(5) * 100 + `%</p>`
+					`<p id="metrics_10" class="card-text" style="margin: 0.4vh;"> Средняя точность [average precision]: ` + 
+					average_precision.toFixed(5) * 100 + `%</p>`
 				}
 				
 				if (!relevant_count_in_db || relevant_count_in_db < relevant_count) {
 					html += 
 					`<p id="metrics_11" class="card-text" style="margin: 0.4vh;">` +
-						`11-точечный график полноты/точности, измеренный по методике TREC [11-point matrix (TREC)]: ` + "Не хватает ифнормации" + 
+						`11-точечный график полноты/точности, измеренный по методике TREC [11-point matrix (TREC)]: ` + "Не хватает информации" + 
 					`</p>`
 				}
 				else {
 					html += 
 					`<p id="metrics_11" class="card-text" style="margin: 0.4vh;">` +
 						`11-точечный график полноты/точности, измеренный по методике TREC [11-point matrix (TREC)]: ` +
-						`<div id="curve_chart" style="width: auto; height: 500px"></div>` + 
+						`<div id="curve_chart" style="width: auto; height: 40vh;"></div>` + 
 					`</p>`
 				}
 				
 				html +=
 				`<hr style="margin: 1vh 0;"/>`+
 				`<p style="margin: 0.4vh;>` + 
-					`<label for="dataForMetricsRecalculate" class="form-label">Количество релевантных документов в базе данных:</label>` +
+					`<label for="dataForMetricsRecalculate" class="form-label">Количество релевантных документов в базе данных [>= ` + relevant_count + `]: </label>` +
 					`<input type="text" class="form-control" id="dataForMetricsRecalculate" placeholder="Количество релевантных документов" style="margin: 1vh 0 1vh 0;">` +
 					
 					`<button id="metricsRecalculate"` + 
@@ -226,25 +227,62 @@ function metrics(relevant_count_in_db=-1) {
 	button_recalculate.addEventListener("click", (event) => metricsRecalculate());
 	
 	// chart
-	if (relevant_count_in_db || relevant_count_in_db > relevant_count) 
-	{
-		drawChart(data)
-	}
+	if (relevant_count_in_db && relevant_count_in_db >= relevant_count) { drawChart(count, relevant_count_in_db, relevant_documents) }
 }
 
-function drawChart() {
+function drawChart(count, relevant_count_in_db, relevant_documents) {
 	try {
-		let data = google.visualization.arrayToDataTable([
-			['Recall', 'Sales', 'Expenses'],
-			['2004',  1000,      400],
-			['2005',  1170,      460],
-			['2006',  660,       1120],
-			['2007',  1030,      540]
-		]);
+		let count = main_store.documents.length
+		let relevant_count = relevant_documents.size
+		let unrelevant_count = count - relevant_count
+		
+		let recall = relevant_count / Math.max(relevant_count_in_db, 1)
+		
+		let recalls = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+		let precisions = []
+		
+		for (i = 0; i < 11; i++) {
+			if (recalls[i] > recall) {	
+				precisions.push(0)
+			}
+			else {
+				let min_count_for_current_recall = 0
+				let current_relevant_count = 0
+				for (const [num_in_queue, document_in_list] of relevant_documents) {
+					current_relevant_count += 1;
+					current = parseInt(num_in_queue) + 1
+					let current_precision = current_relevant_count / Math.max(current, 1)
+					let current_recall = current_relevant_count / Math.max(relevant_count_in_db, 1)
+					if (current_recall >= recalls[i] - 0.005) {
+						min_count_for_current_recall = current
+						precisions.push(current_precision)
+						break
+					}
+				}
+			}
+		}
+		
+		// smoothing the graph
+		let max_current_precision = 0
+		for (i = 10; i >= 0; i--) {
+			if (precisions[i] > max_current_precision)
+				max_current_precision = precisions[i]
+			if (precisions[i] < max_current_precision)
+				precisions[i] = max_current_precision
+		}
+		
+		let data_array = [['Полнота', 'Интерполированные значения']].concat(recalls.map(function(recall, i) {return [recall, precisions[i]]}))
+		let data = google.visualization.arrayToDataTable(data_array);
 
 		let options = {
-			title: 'Company Performance',
-			legend: { position: 'bottom' }
+			title: '11-точечный график полноты/точности [TREC]',
+			legend: { position: 'bottom' },
+			vAxes: {
+			  0: {title: 'Точность'}
+			},
+			hAxes: {
+			  0: {title: 'Полнота'}
+			},
 		};
 
 		let chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
