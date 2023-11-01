@@ -62,7 +62,7 @@ function makeCardsFromResponsData() {
 		// document_url = "http://" + "kruapan.com:3000" + "/" + docname_full
 			
 		html = `
-			<div class="card" style="margin: 2vh 0 1vw 1vw; z-index: 0;">` +
+			<div class="card" style="margin: 2vh 0 1vw 1vw; z-index: 0; box-shadow: 2px 2px 1px rgba(0, 0, 0, .1);">` +
 				`<div class="card-body">` + 
 					`<h5 class="card-title">` + 
 						`<a href="` + document_url + `" class="card-link" target="_blank">` + document_id + ". " + docname_short + `</a>` + 
@@ -155,7 +155,7 @@ function metrics(relevant_count_in_db=-1) {
 	let average_precision = (1 / Math.max(relevant_count_in_db, 1) * precisions_sum)
 	
 	html = `
-		<div class="card" style="width: auto;">` +
+		<div class="card" style="width: auto; box-shadow: 2px 2px 1px rgba(0, 0, 0, .1);">` +
 			`<div class="card-body">` + 
 				`<h5 class="card-title"> Метрики для полученных результатов </h5>` + 
 				`<p id="metrics_1" class="card-text" style="margin: 0.4vh;"> Общее количество документов: ` + count + `</p>` + 
@@ -264,14 +264,15 @@ function drawChart(count, relevant_count_in_db, relevant_documents) {
 		
 		// smoothing the graph
 		let max_current_precision = 0
+		let interpolated = [...precisions]
 		for (i = 10; i >= 0; i--) {
-			if (precisions[i] > max_current_precision)
-				max_current_precision = precisions[i]
-			if (precisions[i] < max_current_precision)
-				precisions[i] = max_current_precision
+			if (interpolated[i] > max_current_precision)
+				max_current_precision = interpolated[i]
+			if (interpolated[i] < max_current_precision)
+				interpolated[i] = max_current_precision
 		}
 		
-		let data_array = [['Полнота', 'Интерполированные значения']].concat(recalls.map(function(recall, i) {return [recall, precisions[i]]}))
+		let data_array = [['Полнота', 'Значения', 'Интерполированные значения']].concat(recalls.map(function(recall, i) {return [recall, precisions[i], interpolated[i]]}))
 		let data = google.visualization.arrayToDataTable(data_array);
 
 		let options = {
