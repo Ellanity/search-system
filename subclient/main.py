@@ -63,7 +63,15 @@ class SearchHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(result.encode("utf-8"))
             else:
                 self.send_error(400, "Bad Request")
-                
+        elif self.path.startswith("/favicon.ico"):
+            self.path = 'site/imgs/favicon.png'
+            super().do_GET()
+            """
+            self.send_response(200)
+            self.send_header("Content-type", "image/x-icon")
+            self.end_headers()
+            self.wfile.write(result.encode("utf-8"))
+            """
         elif self.path.startswith(f"/{SITE_FILES_DIRECTORY_URL}/"):
             super().do_GET()
         else:

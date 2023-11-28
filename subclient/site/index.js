@@ -1,8 +1,10 @@
 // some lines for not to restart page when submit
 let search_form = document.getElementById("search_form");
+
 function handleForm(event) {
 	event.preventDefault(); 
 } 
+
 search_form.addEventListener('submit', handleForm);
 
 // main page store
@@ -13,6 +15,116 @@ class Store {
 }
 
 main_store = new Store()
+
+// speach recognition
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// commands
+let speach_commands = new Set();
+speach_commands.add(
+	{
+		type: "coincidence",
+		phrases: Array("очистить", "очисть"), 
+		func: function() {
+			const search_input = document.getElementById("search_input");
+			search_input.value = "";
+			
+			let content_div = document.getElementById("content"); 
+			clearComponent(content_div);
+					
+			let metrics_div = document.getElementById("metrics");
+			clearComponent(metrics_div);
+		}
+	}
+)
+speach_commands.add(
+	{
+		type: "coincidence",
+		phrases: Array("построить метрики", "построй метрики", "метрики"), 
+		func: metrics 
+	}
+)
+speach_commands.add(
+	{
+		type: "coincidence",
+		phrases: Array("пересчитать", "пересчитай", "пересчитать метрики", "пересчитай метрики"), 
+		func: metricsRecalculate 
+	}
+)
+speach_commands.add(
+	{
+		type: "starts_with",
+		phrases: Array("релевантны документов в базе", "релевантных документов в базе", "релевантный документов в базе", "релевантные документов в базе",
+					   "количество релевантны документов", "количество релевантных документов", "количество релевантный документов", "количество релевантные документов"), 
+		func: function(recognition_result) {
+			const input_for_recalculate = document.getElementById("dataForMetricsRecalculate")
+			let words = recognition_result.split(" ");
+			console.log(words[words.length - 1])
+			input_for_recalculate.value = words[words.length - 1];
+		}
+	}
+)
+speach_commands.add(
+	{
+		type: "starts_with",
+		phrases: Array("найти", "найди", "поиск", "искать"), 
+		func: function(recognition_result) {
+			const search_input = document.getElementById("search_input");
+			search_input.value = recognition_result.substr(recognition_result.indexOf(" ") + 1);
+			search();
+		}
+	}
+)
+
+// logic of recognition
+let recognition = new webkitSpeechRecognition();
+recognition.interimResults = false;
+recognition.lang = 'ru-Ru';
+
+recognition.onresult = function (event) {
+let result = event.results[event.resultIndex];
+	if (result.isFinal) {
+		
+		// console.log('Вы сказали: ', result[0].transcript);
+
+		let recognition_result = result[0].transcript.toLowerCase();
+		let regex = /[.,!?;]/g;
+		recognition_result = recognition_result.replace(regex, '');
+		
+		// console.log(recognition_result)
+		
+		for (let command of speach_commands) {
+			let type = command.type;
+			let phrases = command.phrases;
+			let func = command.func;
+			for (let i = 0, len = phrases.length; i < len; i++) {
+				if (
+					(type == "coincidence" && phrases[i] == recognition_result) ||
+					(type == "starts_with" && recognition_result.startsWith(phrases[i]))
+				) {
+					func(recognition_result);
+					return;
+				}
+			}
+		}
+	} 
+};
+
+recognition.onend = () => {
+	//console.log("Speech recognition service disconnected");
+	recognition.start();
+};
+
+/*
+recognition.onerror = function(event) {
+    console.error('Speech recognition error occurred:', event.error);
+	
+};
+*/
+recognition.start();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 // work with html inner data
@@ -229,6 +341,7 @@ function metrics(relevant_count_in_db=-1) {
 	// chart
 	if (relevant_count_in_db && relevant_count_in_db >= relevant_count) { drawChart(count, relevant_count_in_db, relevant_documents) }
 }
+
 
 function drawChart(count, relevant_count_in_db, relevant_documents) {
 	try {
