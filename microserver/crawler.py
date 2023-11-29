@@ -1,4 +1,5 @@
 from database import DatabaseDocuments
+from language_definer import DefinerNGrammsMethod, DefinerAlphabetMethod, DefinerNeuralNetworkMethod
 from variables import *
 
 from time import time, strptime, mktime, strftime # , gmtime
@@ -114,6 +115,9 @@ class WebСrawler:
             with open(self.__server_dictionary_common_info_path, "w", encoding="utf-8") as server_dictionary_common_info_file:
                 common_info_init_data = {
                     "count_of_words": 0,
+                    "language_defined_by_ngramms_method": "",
+                    "language_defined_by_alphabet_method": "",
+                    "language_defined_by_neural_network_method": "",
                     "count_of_documents": 0,
                 }
                 json.dump(common_info_init_data, server_dictionary_common_info_file)
@@ -224,8 +228,9 @@ class WebСrawler:
 
         # remove tags and newlines from raw text
         pattern = re.compile('<.*?>')
+        html_document_without_tags = re.sub(pattern, '', html_document_with_tags)
         text_from_document = self.__keepCharactersInStringWithRegex(
-            input_string=re.sub(pattern, '', html_document_with_tags).replace('\n', ' '),
+            input_string=html_document_without_tags.replace('\n', ' '),
             reference_string=ALLOWED_DICTIONARY)
             
         # split text by spaces and getting words with counts
@@ -241,8 +246,23 @@ class WebСrawler:
             } for lexem in list_of_lexems
         }
         
+        # language definition
+        language_defined_by_ngramms_method = ""
+        language_defined_by_alphabet_method = ""
+        language_defined_by_neural_network_method = ""
+
+        try: language_defined_by_ngramms_method = DefinerNGrammsMethod.define(html_document_without_tags)
+        except: pass
+        try: language_defined_by_alphabet_method =DefinerAlphabetMethod.define(html_document_without_tags)
+        except: pass
+        try: language_defined_by_neural_network_method = DefinerNeuralNetworkMethod.define(html_document_without_tags)
+        except: pass
+
         search_image_document = {
             "count_of_words": len(list_of_lexems),
+            "language_defined_by_ngramms_method": language_defined_by_ngramms_method,
+            "language_defined_by_alphabet_method": language_defined_by_alphabet_method,
+            "language_defined_by_neural_network_method": language_defined_by_neural_network_method,
             "dict_of_lexems": dict_of_lexems
         }
 
@@ -506,6 +526,7 @@ class WebСrawler:
     def __transactionDocumentSearchImageAdd(self, document_url):
         # create record in db        
         time_structure = datetime.now()
+
         self.__database.addDocument(
             url_document=(os.path.join(document_url)),
             search_image_document=(os.path.join(SEARCH_IMAGES_DOCUMENTS_DIRECTORY_URL, document_url + ".json")),

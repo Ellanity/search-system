@@ -16,7 +16,8 @@ class subclientApp:
     def __loadServers(self):
         for server in SERVERS.keys():
             self.__servers[server] = SERVERS[server]
-            
+
+    ### command to start search requests
     def search(self, request):
         responses = []
         for server in self.__servers.keys():
@@ -25,8 +26,10 @@ class subclientApp:
                 request_url = "http://" + server_address + "/search?request_content=" + "\"" + request + "\"" 
                     
                 response = requests.get(url = request_url).json()
+                
                 # add response from every server to common responses
                 for document in response:
+                    
                     # set server url for every found document
                     document["server"] = server_address
                     responses.append(document)
@@ -38,14 +41,17 @@ class subclientApp:
         # return json.dumps(responses, indent=4)
     
 
+# Main http handler class 
 class SearchHandler(http.server.SimpleHTTPRequestHandler):
     
     def __init__(self, *args, app=None, **kwargs):
         self.__app = app
         super().__init__(*args, directory=WORKING_DIRECTORY, **kwargs)
     
+    # GET method
     def do_GET(self):
-        # search api endpoint
+
+        ### search api endpoint
         if self.path.startswith("/search?request_content="):
             parsed_url = urllib.parse.urlparse(self.path)
             query_params = urllib.parse.parse_qs(parsed_url.query)
@@ -63,17 +69,15 @@ class SearchHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(result.encode("utf-8"))
             else:
                 self.send_error(400, "Bad Request")
+
+        ### favicon endpoint
         elif self.path.startswith("/favicon.ico"):
             self.path = 'site/imgs/favicon.png'
             super().do_GET()
-            """
-            self.send_response(200)
-            self.send_header("Content-type", "image/x-icon")
-            self.end_headers()
-            self.wfile.write(result.encode("utf-8"))
-            """
+
         elif self.path.startswith(f"/{SITE_FILES_DIRECTORY_URL}/"):
             super().do_GET()
+        
         else:
             self.send_error(404, "Not found")
 

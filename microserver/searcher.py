@@ -29,6 +29,7 @@ class Searcher:
     
     def __findVectorsSimilarWithRequest(self, vector_request, vectors_documents):
         similarities_list = []
+        
         for document in vectors_documents.keys():
             similarity = self.__calculateSimilarityOfVectors(vector_request, vectors_documents[document])
             if similarity != 0:
@@ -36,6 +37,7 @@ class Searcher:
                     "document": document, 
                     "similarity": similarity,
                     "weights": vectors_documents[document]})
+        
         return similarities_list
     
     # https://ru.wikipedia.org/wiki/%D0%92%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D0%B0%D1%8F_%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D1%8C
@@ -126,7 +128,7 @@ class Searcher:
         
         return vector_request        
     
-    def search(self, request_content):
+    def search(self, request_content) -> str:
         vector_request = self.__vectorSearchImageRequest(request_content)
         vectors_documents = self.__vectorsSearchImagesDocuments(vector_request)
         response = self.__findVectorsSimilarWithRequest(vector_request, vectors_documents)
