@@ -136,6 +136,8 @@ function fillComponent(component, fill_data) {
 	component.appendChild(fill_data);
 }
 
+let languages = {"ru": "Русский", "it": "Итальянский"}
+
 // make cards of documents
 function makeCardsFromResponsData() {
 	let content = document.createElement('div');
@@ -158,10 +160,14 @@ function makeCardsFromResponsData() {
 		let document_id = (parseInt(num_in_queue) + 1).toString()
 		// docname
 		let docname_full = document_in_list.document.replaceAll('\\', '/')
-		let docname_short = docname_full.split('/').pop().replaceAll(' ', '_')
+		let docname_short = docname_full.split('/').pop().replaceAll(' ', '_').replaceAll('.', '_')
 		
 		// similarity
 		let similarity = (document_in_list.similarity * 100).toFixed(2)
+		let language_defined = (document_in_list.language_defined)
+		let by_ngramms_method = language_defined.by_ngramms_method
+		let by_alphabet_method = language_defined.by_alphabet_method
+		let by_neural_network_method = language_defined.by_neural_network_method
 		
 		// words
 		let words_in_document = [] 
@@ -181,17 +187,58 @@ function makeCardsFromResponsData() {
 					`</h5>` + 
 					`<p class="card-text" style="margin: 0.4vh;"> Слова: ` + words_in_document.join(', ') + `</p>` + 
 					`<p class="card-text" style="margin: 0.4vh 1vw;"> > Совпадение: ` + similarity + `% ` + `</p>`
-					if (similarity >= 50) {
-						html += `<p class="card-text" style="margin: 0.4vh 1vw;">` +
-							`> Результат является релевантным: <input class="relevant_checkbox" id="checkbox_` + docname_short + `" type="checkbox" checked>` + 
-						`</p>`
-					}
-					else {
-						html += `<p class="card-text" style="margin: 0.4vh 1vw;">` +
-							`> Результат является релевантным: <input class="relevant_checkbox" id="checkbox_` + docname_short + `" type="checkbox">` + 
-						`</p>`
-					}
-				html +=
+		if (similarity >= 50) {
+			html += `
+					<p class="card-text" style="margin: 0.4vh 1vw;">` +
+						`> Результат является релевантным: <input class="relevant_checkbox" id="checkbox_` + docname_short + `" type="checkbox" checked>` + 
+					`</p>`
+		}
+		else {
+			html += `
+					<p class="card-text" style="margin: 0.4vh 1vw;">` +
+						`> Результат является релевантным: <input class="relevant_checkbox" id="checkbox_` + docname_short + `" type="checkbox">` + 
+					`</p>`
+		}
+		html += `
+					<p class="card-text" style="margin: 0.4vh 0vw 1vh 1vw;">` +
+						`> Язык документа: ` + 
+						languages[
+							Object.values(language_defined).reduce(
+							(a, b, _, arr) => (
+								arr.filter(v => v === a).length >= arr.filter(v => v === b).length ? a : b)
+							)
+						] + 
+					`</p>`+
+					`<div class="accordion" id="according_define_language_info_` + docname_short +`">` +
+						`<div class="accordion-item">` +
+							`<h2 class="accordion-header" id="heading_` + docname_short +`">` +
+								
+								`<button class="accordion-button collapsed"` +
+									 	`type="button"` +
+										`data-bs-toggle="collapse"` +
+										`data-bs-target="#collapse_` + docname_short +`"` +
+										`aria-expanded="false"` +
+										`aria-controls="collapse_` + docname_short +`">` +
+									`Подробнее об определении языка текста` +
+								`</button>` +
+
+							`</h2>` +
+
+							`<div id="collapse_` + docname_short +`"` +
+								  `class="accordion-collapse collapse"` +
+								  `aria-labelledby="heading_` + docname_short +`"` +
+								  `data-bs-parent="#according_define_language_info_` + docname_short +`">` +
+
+								`<div class="accordion-body">` +
+									`<ul class="list-group">` + 
+										`<li class="list-group-item"> N-грамм метод: ` + languages[by_ngramms_method] + `</li>` +
+										`<li class="list-group-item"> Алфавитный метод: ` + languages[by_alphabet_method] + `</li>` +
+										`<li class="list-group-item"> Нейросетевой метод: ` + languages[by_neural_network_method] + `</li>` +
+									`</ul>` +
+								`</div>` +
+							`</div>` +
+						`</div>` +
+					`</div>` +
 				`</div>` +
 			`</div>`
 		cards.push(html)
@@ -225,9 +272,11 @@ function metrics(relevant_count_in_db=-1) {
 	let relevant_documents = new Map()
 	for (const [num_in_queue, document_in_list] of Object.entries(main_store.documents)) {
 		let docname_full = document_in_list.document.replaceAll('\\', '/')
-		let docname_short = docname_full.split('/').pop().replaceAll(' ', '_')
+		let docname_short = docname_full.split('/').pop().replaceAll(' ', '_').replaceAll('.', '_')
 		let checkbox_relevant = document.getElementById("checkbox_" + docname_short)
-		if (checkbox_relevant.checked) {relevant_documents.set(num_in_queue, document_in_list)}
+		if (checkbox_relevant.checked) {
+			relevant_documents.set(num_in_queue, document_in_list)
+		}
 	}
 	
 	// console.log(relevant_documents)

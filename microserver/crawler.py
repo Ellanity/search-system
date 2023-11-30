@@ -260,9 +260,11 @@ class WebСrawler:
 
         search_image_document = {
             "count_of_words": len(list_of_lexems),
-            "language_defined_by_ngramms_method": language_defined_by_ngramms_method,
-            "language_defined_by_alphabet_method": language_defined_by_alphabet_method,
-            "language_defined_by_neural_network_method": language_defined_by_neural_network_method,
+            "language_defined": {
+                "by_ngramms_method": language_defined_by_ngramms_method,
+                "by_alphabet_method": language_defined_by_alphabet_method,
+                "by_neural_network_method": language_defined_by_neural_network_method,
+            },
             "dict_of_lexems": dict_of_lexems
         }
 

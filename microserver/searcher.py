@@ -11,6 +11,13 @@ class Searcher:
     def __init__(self):
         self.__init_system_variables__()
         self.__database = DatabaseDocuments() 
+        # documents data
+        self.documets_from_db = []
+        self.documets_search_images = {}
+
+    def __reinit_variables__(self):
+        self.documets_from_db = []
+        self.documets_search_images = {}
         
     def __init_system_variables__(self):
         # check variables
@@ -36,7 +43,9 @@ class Searcher:
                 similarities_list.append({
                     "document": document, 
                     "similarity": similarity,
-                    "weights": vectors_documents[document]})
+                    "weights": vectors_documents[document],
+                    "language_defined": self.documets_search_images[document]["language_defined"]
+                    })
         
         return similarities_list
     
@@ -64,23 +73,23 @@ class Searcher:
         return similarity
     
     def __vectorsSearchImagesDocuments(self, vector_request) -> dict:
-        # getSearchImagesOfDocumentsFromDatabase
-        documets_from_db = self.__database.getDocumentAll()
+        # get documents from database
+        self.documets_from_db = self.__database.getDocumentAll()
         
-        if documets_from_db == []:
+        if self.documets_from_db == []:
             return
             
         vectors_documents = {}
-        
-        for document in documets_from_db:
+        for document in self.documets_from_db:
+            # save image in search images of documents
             search_image_document = self.__getSearchImageDocument(document_url=document[0], temp=False)
+            self.documets_search_images[document[0]] = search_image_document
+            
+            # save vector in vectors of documents
             vector_document = self.__vectorSearchImageDocument(vector_request, search_image_document)
             vectors_documents[document[0]] = vector_document
-            
+        
         return vectors_documents
-
-        # if documets_from_db != []:
-        #     documets_from_db_set = set(item[0] for item in documets_from_db)
     
     def __getSearchImageDocument(self, document_url, temp=False):
         search_image_document = {}
@@ -129,9 +138,15 @@ class Searcher:
         return vector_request        
     
     def search(self, request_content) -> str:
-        vector_request = self.__vectorSearchImageRequest(request_content)
-        vectors_documents = self.__vectorsSearchImagesDocuments(vector_request)
-        response = self.__findVectorsSimilarWithRequest(vector_request, vectors_documents)
         
-        return json.dumps(response, indent=4)
-    
+        try:
+            self.__reinit_variables__()
+
+            vector_request = self.__vectorSearchImageRequest(request_content)
+            vectors_documents = self.__vectorsSearchImagesDocuments(vector_request)
+            response = self.__findVectorsSimilarWithRequest(vector_request, vectors_documents)
+        
+            return json.dumps(response, indent=4)
+        except Exception as ex: 
+            print("Searcher error: ", ex)
+            return ""
