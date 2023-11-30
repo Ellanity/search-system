@@ -1,9 +1,12 @@
+# custom modules
 from database import DatabaseDocuments
 from language_definer import DefinerNGrammsMethod, DefinerAlphabetMethod, DefinerNeuralNetworkMethod
 from variables import *
 
+# stadard modules
 from time import time, strptime, mktime, strftime # , gmtime
 from datetime import datetime
+from bs4 import BeautifulSoup
 import os
 import re
 import codecs
@@ -115,9 +118,6 @@ class WebСrawler:
             with open(self.__server_dictionary_common_info_path, "w", encoding="utf-8") as server_dictionary_common_info_file:
                 common_info_init_data = {
                     "count_of_words": 0,
-                    "language_defined_by_ngramms_method": "",
-                    "language_defined_by_alphabet_method": "",
-                    "language_defined_by_neural_network_method": "",
                     "count_of_documents": 0,
                 }
                 json.dump(common_info_init_data, server_dictionary_common_info_file)
@@ -228,7 +228,7 @@ class WebСrawler:
 
         # remove tags and newlines from raw text
         pattern = re.compile('<.*?>')
-        html_document_without_tags = re.sub(pattern, '', html_document_with_tags)
+        html_document_without_tags = re.sub(pattern, ' ', html_document_with_tags)
         text_from_document = self.__keepCharactersInStringWithRegex(
             input_string=html_document_without_tags.replace('\n', ' '),
             reference_string=ALLOWED_DICTIONARY)
