@@ -1,12 +1,14 @@
 # database 
-documents.db
+*.db
 documents.db-journal
 
-# project directories
-server_dictionary/
+# project directories that must be filled with user of system
 documents/
+# project directories that must be filled automatically
+server_dictionary/
 temp/
 search_images_documents/
+documents_for_language_definer/documents_profiles/ngrams/
 
 # trash directories 
 __pycache__/
