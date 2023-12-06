@@ -9,10 +9,27 @@ TIME_FORMAT="%Y.%m.%dT%H:%M:%S"
 # crawler
 DOCUMENTS_DIRECTORY_URL="documents"
 SEARCH_IMAGES_DOCUMENTS_DIRECTORY_URL="search_images_documents"
+
+# CRAWLER_TIMESPAN_SEC=300
 CRAWLER_TIMESPAN_SEC=600
+
+# CRAWLER_DOCUMENTS_READD_TIMESPAN_SEC=200
 CRAWLER_DOCUMENTS_READD_TIMESPAN_SEC=86400
-ALLOWED_DICTIONARY="ёйцукенгшщзхъфывапролджэячсмитьибю "
+
+ALLOWED_DICTIONARY="ёйцукенгшщзхъфывапролджэячсмитьибюabcdefghijklmnopqrstuvwxyzàèéìíîòóùú "
+# ALLOWED_DICTIONARY="ёйцукенгшщзхъфывапролджэячсмитьибю "
+
 DELIMETERS_OF_TEXT=" |.|,|_|-|!|&|?|\"|'|%|^|*|(|)|@|#|~|:|/|\\|=|$"
+
+# language_definer
+DOCUMENTS_FOR_DEFINER_DIRECTORY_URL="documents_for_language_definer"
+DOCUMENTS_FOR_DEFINER_SOURCES_DIRECTORY_URL="documents_sources"
+DOCUMENTS_FOR_DEFINER_PROFILES_DIRECTORY_URL="documents_profiles"
+NGRAMM_SIZE = 4
+# # # # #
+LANGUAGES_TO_DEFINE=("ru", "it")
+LANGUAGES_ALPHABETS={"ru": "ёйцукенгшщзхъфывапролджэячсмитьибю",
+                     "it": "abcdefghijklmnopqrstuvwxyzàèéìíîòóùú"}
 
 #analyzer
 SERVER_DICTIONARY_DIRECTORY_URL="server_dictionary"

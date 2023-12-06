@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html class="client" lang="it">
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			Polimorfismo (informatica)
+		</title>
+	</head>
+	<body>
+		<div class="page_content">
+			Лабораторная 2
+			<hr/>
+			In informatica, il termine polimorfismo (dal greco πολυμορφος composto dai termini πολυ molto e μορφή forma quindi "avere molte forme") viene usato in senso generico per riferirsi a espressioni che possono rappresentare valori di diversi tipi (dette espressioni polimorfiche). In un linguaggio non tipizzato, tutte le espressioni sono intrinsecamente polimorfiche.
+Il termine viene associato a due significati specifici:
+
+nel contesto della programmazione orientata agli oggetti, si riferisce al fatto che un'espressione il cui tipo sia descritto da una classe A può assumere valori di un qualunque tipo descritto da una classe B sottoclasse di A (polimorfismo per inclusione);
+nel contesto della programmazione generica, si riferisce al fatto che il codice del programma può ricevere un tipo come parametro invece che conoscerlo a priori (polimorfismo parametrico).
+
+
+== Polimorfismo per inclusione ==
+Solitamente è legato alle relazioni di eredità tra classi, che garantisce che tali oggetti, pur di tipo differente, abbiano una stessa interfaccia: nei linguaggi ad oggetti tipizzati, le istanze di una sottoclasse possono essere utilizzate al posto di istanze della superclasse (polimorfismo per inclusione).
+L'overriding dei metodi o delle proprietà permette che gli oggetti appartenenti alle sottoclassi di una stessa classe rispondano diversamente agli stessi utilizzi. Ad esempio, si supponga di avere una gerarchia in cui le classi Cane e Gatto discendono dalla superclasse Animale. Quest'ultima definisce un metodo cosaMangia(), le cui specifiche sono: Restituisce una stringa che identifica il nome dell'alimento tipico dell'animale. I due metodi cosaMangia() definiti nelle classi Cane e Gatto si sostituiscono a quello che ereditano da Animale e, rispettivamente, restituiscono due risultati diversi a seconda del tipo effettivo dell'oggetto su cui viene richiamato il metodo. Il comportamento di un programma abbastanza complesso, quindi, può essere alterato considerevolmente in funzione delle sottoclassi che sono istanziate a tempo di esecuzione e le cui istanze sono passate alle varie parti del codice.
+I metodi che vengono ridefiniti in una sottoclasse sono detti polimorfi, in quanto lo stesso metodo si comporta diversamente a seconda del tipo di oggetto su cui è invocato.
+In linguaggi in cui le variabili non hanno tipo, come Ruby, Python e Smalltalk, non esiste un controllo sintattico sui metodi che è possibile richiamare (duck typing). Da un lato, ciò estende le possibilità del polimorfismo oltre le relazioni di ereditarietà: nell'esempio di prima, non è necessario che le classi Cane e Gatto siano sottoclassi di Animale, perché ai client interessa solo che i tre tipi espongano uno stesso metodo con il nome cosaMangia e la lista di argomenti vuota. D'altra parte, ciò aumenta la possibilità di errori a tempo di esecuzione, perché non è possibile imporre alle classi il rispetto dell'interfaccia comune, e quindi un eventuale errore viene individuato non dal compilatore (con il conseguente rifiuto di compilare) ma solo al momento in cui un certo client cercherà di servirsi di un metodo o attributo inesistente o definito in maniera non conforme alle specifiche.
+
+
+=== Vantaggi ===
+Il polimorfismo per inclusione permette al programma di fare uso di oggetti che espongono una stessa interfaccia, ma implementazioni diverse. Infatti, l'interfaccia del tipo base definisce un contratto generale che sottoclassi diverse possono soddisfare in modi diversi - ma tutti conformi alla specifica comune stabilita dal tipo base. Di conseguenza, la parte del programma che fruisce di questa interfaccia - chiamata in gergo client - tratta in modo omogeneo tutti gli oggetti che forniscono un dato insieme di servizi, a prescindere dalle loro implementazioni interne (presumibilmente diverse tra loro) definite dalle rispettive classi. In virtù di questa possibilità, si può utilizzare lo stesso codice personalizzandone o modificandone anche radicalmente il comportamento, senza doverlo riscrivere, ma semplicemente fornendogli in input una differente implementazione del tipo base o dei tipi base.
+Se usato bene, il polimorfismo permette di avere una struttura ad oggetti
+
+estensibile, in quanto si può indurre il client ad invocare nuovi metodi personalizzati includendoli in una classe apposita;
+resistente, perché eventuali esigenze future nel programma o nella scrittura del codice potranno essere implementate fornendo ad un client già scritto una nuova classe scritta ad hoc.
+
+
+=== Caso di partenza: le figure ===
+Si supponga di voler sviluppare un programma in grado di disegnare dei poligoni di date dimensioni a schermo.
+Ogni poligono va disegnato in un modo diverso, utilizzando le librerie fornite dal linguaggio utilizzato.
+Poiché a run-time non sapremo esattamente quanti e quali poligoni dovremo disegnare, è necessario che il compilatore possa ricondurre quadrato, cerchio, pentagono eccetera ad uno stesso oggetto, in modo tale da riconoscerne i metodi utilizzati. Per fare ciò si dichiara una classe base Figura, dalla quale tutte le altre erediteranno le proprietà.
+
+La classe baseEsempio (linguaggio Visual Basic):
+
+Si è appena dichiarata una classe che deve essere ereditata da altre classi, e mai utilizzata come classe base, una cosiddetta classe astratta. I metodi, inoltre, devono essere sottoposti ad override (lett. scavalcamento) dalle classi che ereditano da essa. Una volta fatto questo, si possono implementare tutte le figure che vogliamo.
+
+Alcune classi derivateNell'esempio che segue si omettono le implementazioni di alcuni membri
+
+E così via con le altre figure. In questo modo, volendo lavorare con un array di figure non si generano conflitti di tipo, come nell'esempio che segue:
+
+L'esecutore, ad ogni figura che incontrerà, effettuerà una chiamata alla subroutine opportuna della classe di appartenenza.
+Ecco in che modo ciò avviene.
+
+
+=== Compilazione ===
+Il polimorfismo si ha con un'azione combinata di compilatore e linker. Al contrario di quanto accade nella maggior parte dei casi, il run-time ha un ruolo importantissimo nell'esecuzione di codice polimorfo, in quanto non è possibile sapere, a compile-time, la classe di appartenenza degli oggetti istanziati. Il compilatore ha il ruolo di preparare l'occorrente per far decidere l'esecutore quale metodo invocare.
+Ai fini della programmazione polimorfa non è necessario conoscere il linguaggio assemblativo, tuttavia è necessario avere alcune nozioni di base sull'indirizzamento per capire quanto segue.
+
+Cosa avviene a compile-time
+la TMVQuando viene compilata la classe base, il compilatore identifica i metodi che sono stati dichiarati virtuali (parola chiave MustOverride in Visual Basic, virtual in C++ e simbolo "#" in progettazione UML), e costruisce una Tabella dei Metodi Virtuali, indicando le signature o firma delle funzioni da sottoporre a override. Queste funzioni restano quindi "orfane", non hanno cioè un indirizzo per l'entry-point.
+Quando il compilatore si occupa delle classi derivate, raggruppa i metodi sottoposti ad override in una nuova TMV, di struttura identica a quella della classe base, stavolta indicando gli indirizzi dell'entry-point.
+Ai fini teorici, si può supporre una tabella di questo tipo:
+
+Non importa in quale ordine siano mappate le funzioni, l'importante è che si trovino nello stesso ordine (allo stesso offset) in tabella.
+Nota: a livello assembly le TMV non hanno identificatori: sono semplici aree di memoria di lunghezza prefissata (32 o 64 bit solitamente). Gli identificatori sono stati inseriti nell'esempio ai soli fini illustrativi.
+
+Cosa avviene a run-time
+il binding dinamicoSi è visto che il compilatore lascia spazi vuoti per i metodi non mappati. Si analizzi passo-passo, come in un trace, tutto ciò che avviene a run-time.
+Codice di riferimento:
+
+Si supponga di aver istanziato un cerchio e di volerlo disegnare. La prima istruzione non ha grande funzionalità: riserva semplicemente spazio sullo stack per la variabile Circle di una lunghezza pari a Figura. Nella seconda istruzione tale stack viene di fatto popolato con la chiamata al costruttore.
+A seconda del linguaggio, la TMV di Figura viene sovrascritta con quella di Cerchio e il valore 3 viene allocato nell'area riservata al raggio di tipo Double (64 bit solitamente).
+Nella terza istruzione l'esecutore consulta la TMV di Cerchio e preleva l'indirizzo della prima delle funzioni mappate. Questo perché ad assembly-level non vi sono identificatori di alcun tipo.
+Una volta prelevato l'indirizzo, il programma è pronto per il salto all'entry-point di Disegna.
+
+
+== Polimorfismo parametrico ==
+Un altro meccanismo spesso disponibile nei linguaggi tipizzati è il polimorfismo parametrico: in determinati contesti, è possibile definire delle variabili dal tipo parametrizzato, che viene poi specificato durante l'uso effettivo. Esempi di polimorfismo parametrico sono i template del C++ e i generics del Java.
+
+
+== Voci correlate ==
+Ereditarietà (informatica)
+Ereditarietà multipla
+Classe (informatica)
+Classe astratta
+Incapsulamento (informatica)
+
+
+== Collegamenti esterni ==
+(EN) polymorphism, in Free On-line Dictionary of Computing, Denis Howe. Disponibile con licenza GFDL
+		</div>
+		<div class="page_summary" style="margin-top: 3vh;">
+			In informatica, il termine polimorfismo (dal greco πολυμορφος composto dai termini πολυ molto e μορφή forma quindi "avere molte forme") viene usato in senso generico per riferirsi a espressioni che possono rappresentare valori di diversi tipi (dette espressioni polimorfiche). In un linguaggio non tipizzato, tutte le espressioni sono intrinsecamente polimorfiche.
+Il termine viene associato a due significati specifici:
+
+nel contesto della programmazione orientata agli oggetti, si riferisce al fatto che un'espressione il cui tipo sia descritto da una classe A può assumere valori di un qualunque tipo descritto da una classe B sottoclasse di A (polimorfismo per inclusione);
+nel contesto della programmazione generica, si riferisce al fatto che il codice del programma può ricevere un tipo come parametro invece che conoscerlo a priori (polimorfismo parametrico).
+
+
+		</div>
+	</body>
+</html>

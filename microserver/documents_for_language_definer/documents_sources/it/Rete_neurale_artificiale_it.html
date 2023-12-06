@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html class="client" lang="it">
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			Rete neurale artificiale
+		</title>
+	</head>
+	<body>
+		<div class="page_content">
+			Лабораторная 2
+			<hr/>
+			Nel campo dell'apprendimento automatico, una rete neurale artificiale (in inglese artificial neural network, abbreviato in ANN o anche come NN) è un modello computazionale composto di "neuroni" artificiali, ispirato vagamente alla semplificazione di una rete neurale biologica.
+Questi modelli matematici sono troppo semplici per ottenere una comprensione delle reti neurali biologiche, ma sono utilizzati per tentare di risolvere problemi ingegneristici di intelligenza artificiale come quelli che si pongono in diversi ambiti tecnologici (in elettronica, informatica, simulazione, e altre discipline).
+Una rete neurale artificiale può essere realizzata sia da programmi software che da hardware dedicato (DSP, Digital Signal Processing). Questa branca può essere utilizzata in congiunzione alla logica fuzzy.
+
+
+== Storia ==
+L'ampia varietà di modelli non può prescindere dal costituente di base, il neurone artificiale proposto da W.S. McCulloch e Walter Pitts in un famoso lavoro del 1943: A Logical Calculus of the Ideas Immanent in Nervous Activity (Un calcolo logico delle idee immanenti ad un'attività nervosa), il quale schematizza un combinatore lineare a soglia, con dati binari multipli in entrata e un singolo dato binario in uscita: un numero opportuno di tali elementi, connessi in modo da formare una rete, è in grado di calcolare semplici funzioni booleane.
+Le prime ipotesi di apprendimento furono introdotte da D. O. Hebb nel libro del 1949: The Organization of Behaviour (L'organizzazione del comportamento), nel quale vengono proposti collegamenti con i modelli complessi del cervello.
+Nel 1958, J. Von Neumann nella sua opera The Computer and the Brain, esamina le soluzioni proposte dai precedenti autori sottolineando la scarsa precisione che queste strutture possedevano per potere svolgere operazioni complesse.
+Nello stesso anno, Frank Rosenblatt nella rivista Psychological review, introduce il primo schema di rete neurale, detto Perceptron (percettrone), antesignano delle attuali reti neurali, per il riconoscimento e la classificazione di forme, allo scopo di fornire un'interpretazione dell'organizzazione generale dei sistemi biologici. Il modello probabilistico di Rosenblatt è quindi mirato all'analisi, in forma matematica, di funzioni quali l'immagazzinamento delle informazioni, e della loro influenza sul riconoscimento dei pattern; esso costituisce un progresso decisivo rispetto al modello binario di McCulloch e Pitts, perché i suoi pesi sinaptici sono variabili e quindi il percettrone è in grado di apprendere.
+L'opera di Rosenblatt stimola una quantità di studi e ricerche che dura per un decennio, e suscita un vivo interesse e notevoli aspettative nella comunità scientifica, destinate tuttavia ad essere notevolmente ridimensionate allorché nel 1969 Marvin Minsky e Seymour A. Papert, nell'opera Perceptrons. An Introduction to Computational Geometry, mostrano i limiti operativi delle semplici reti a due strati basate sul percettrone, e dimostrano l'impossibilità di risolvere per questa via molte classi di problemi, ossia tutti quelli non caratterizzati da separabilità lineare delle soluzioni: questo tipo di rete neurale non è abbastanza potente; non è infatti neanche in grado di calcolare la funzione or esclusivo (XOR). A causa di queste limitazioni, al periodo di euforia dovuto ai primi risultati della cibernetica (come veniva chiamata negli anni sessanta) segue un periodo di diffidenza durante il quale tutte le ricerche in questo campo non ricevono più alcun finanziamento dal governo degli Stati Uniti d'America; le ricerche sulle reti tendono, di fatto, a ristagnare per oltre un decennio, e l'entusiasmo iniziale risulta fortemente ridimensionato.
+Il contesto matematico per addestrare le reti MLP (Multi-Layers Perceptron, ossia percettrone multistrato) fu stabilito dal matematico americano Paul Werbos nella sua tesi di dottorato (Ph.D.) del 1974. Non fu dato molto peso al suo lavoro, tanto fu forte la confutazione dimostrata da Minsky e Papert anni prima, e solo l'intervento di J. J. Hopfield, nel 1982, che in un suo lavoro studia dei modelli di riconoscimento di pattern molto generali, si oppose in modo diretto alla confutazione di Minsky riaprendo così degli spiragli per la ricerca in questo campo.
+Uno dei metodi più noti ed efficaci per l'addestramento di tale classe di reti neurali è il cosiddetto algoritmo di retropropagazione dell'errore ("error backpropagation"), proposto nel 1986 da David E. Rumelhart, G. Hinton e R. J. Williams, il quale modifica sistematicamente i pesi delle connessioni tra i nodi, così che la risposta della rete si avvicini sempre di più a quella desiderata. Tale lavoro fu prodotto riprendendo il modello creato da Werbos. L'algoritmo di retropropagazione (BP) è una tecnica di apprendimento tramite esempi, costituente una generalizzazione dell'algoritmo di apprendimento per il percettrone sviluppato da Rosenblatt nei primi anni '60. Mediante questa tecnica era possibile, come detto, trattare unicamente applicazioni caratterizzabili come funzioni booleane linearmente separabili.
+L'algoritmo di apprendimento si basa sul metodo della discesa del gradiente che permette di trovare un minimo locale di una funzione in uno spazio a N dimensioni. I pesi associati ai collegamenti tra gli strati di neuroni si inizializzano a valori piccoli (ovvero molto inferiori ai valori reali che poi assumeranno) e casuali, e poi si applica la regola di apprendimento presentando alla rete dei pattern di esempio. Queste reti neurali sono poi capaci di generalizzare in modo appropriato, cioè di dare risposte plausibili per input che non hanno mai visto.
+L'addestramento di una rete neurale di tipo BP avviene in due diversi stadi: forward-pass e backward-pass. Nella prima fase i vettori in input sono applicati ai nodi in ingresso con una propagazione in avanti dei segnali attraverso ciascun livello della rete (forward-pass). Durante questa fase i valori dei pesi sinaptici sono tutti fissati. Nella seconda fase la risposta della rete viene confrontata con l'uscita desiderata ottenendo il segnale di errore. L'errore calcolato è propagato nella direzione inversa rispetto a quella delle connessioni sinaptiche. I pesi sinaptici infine sono modificati in modo da minimizzare la differenza tra l'uscita attuale e l'uscita desiderata (backward-pass).
+Tale algoritmo consente di superare le limitazioni del percettrone e di risolvere il problema della separabilità non lineare (e quindi di calcolare la funzione XOR), segnando il definitivo rilancio delle reti neurali, come testimoniato anche dall'ampia varietà di applicazioni commerciali: attualmente la BP rappresenta un algoritmo di largo uso in molti campi applicativi.
+
+
+== Fondamenti ==
+Una rete neurale artificiale (ANN "Artificial Neural Network" in inglese), normalmente chiamata solo "rete neurale" (NN "Neural Network" in inglese), è un modello matematico/informatico di calcolo basato sulle reti neurali biologiche. Tale modello è costituito da un gruppo di interconnessioni di informazioni costituite da neuroni artificiali e processi che utilizzano un approccio di connessionismo di calcolo. Nella maggior parte dei casi una rete neurale artificiale è un sistema adattivo che cambia la propria struttura in base a informazioni esterne o interne che scorrono attraverso la rete stessa durante la fase di apprendimento.
+In termini pratici le reti neurali sono strutture non-lineari di dati statistici organizzate come strumenti di modellazione. Esse possono essere utilizzate per simulare relazioni complesse tra ingressi e uscite che altre funzioni analitiche non riescono a rappresentare.
+Una rete neurale artificiale riceve segnali esterni su uno strato di nodi (unità di elaborazione) di ingresso, ciascuno dei quali è collegato con numerosi nodi interni, organizzati in più livelli. Ogni nodo elabora i segnali ricevuti e trasmette il risultato a nodi successivi.
+
+
+== Teoria e paradigmi di apprendimento ==
+
+
+=== Analisi del sistema di apprendimento di una rete neurale ===
+Il concetto di rete neurale si pone perché una funzione 
+  
+    
+      
+        f
+        (
+        x
+        )
+      
+    
+    {\displaystyle f(x)}
+   è definita come una composizione di altre funzioni 
+  
+    
+      
+        G
+        (
+        x
+        )
+      
+    
+    {\displaystyle G(x)}
+  , che possono a loro volta essere ulteriormente definite come composizione di altre funzioni. Questo può essere comodamente rappresentato come una struttura di reti, con le frecce raffiguranti le dipendenze tra variabili. Una rappresentazione ampiamente utilizzata è la somma ponderata non lineare, dove 
+  
+    
+      
+        f
+        (
+        x
+        )
+        =
+        g
+        
+          (
+          
+            
+            
+              
+                ∑
+              
+              
+                i
+              
+            
+            
+              w
+              
+                i
+              
+            
+            
+              x
+              
+                i
+              
+            
+          
+          )
+        
+      
+    
+    {\displaystyle f(x)=g\left(\,{\sum }_{i}w_{i}x_{i}\right)}
+  , dove 
+  
+    
+      
+        g
+      
+    
+    {\displaystyle g}
+   è una funzione predefinita, come ad esempio la tangente iperbolica. Sarà conveniente per le seguenti far riferimento ad un insieme di funzioni come un vettore 
+  
+    
+      
+        g
+        =
+        (
+        
+          g
+          
+            1
+          
+        
+        ,
+        
+          g
+          
+            2
+          
+        
+        ,
+        …
+        ,
+        
+          g
+          
+            n
+          
+        
+        )
+      
+    
+    {\displaystyle g=(g_{1},g_{2},\ldots ,g_{n})}
+  .
+
+La Figura 1 esemplifica una decomposizione della funzione 
+  
+    
+      
+        f
+      
+    
+    {\displaystyle f}
+  , con dipendenze tra le variabili indicate dalle frecce. Queste possono essere interpretate in due modi:
+
+Il primo punto di vista è la vista funzionale: l'ingresso 
+  
+    
+      
+        x
+      
+    
+    {\displaystyle x}
+   è trasformato in un vettore a 3-dimensioni, che viene poi trasformato in un vettore bi-dimensionale 
+  
+    
+      
+        g
+      
+    
+    {\displaystyle g}
+  , che è poi finalmente trasformato in 
+  
+    
+      
+        f
+      
+    
+    {\displaystyle f}
+  . Questo punto di vista è più comunemente riscontrato nel contesto dell'ottimizzazione.
+Il secondo punto di vista è la vista probabilistica: la variabile casuale 
+  
+    
+      
+        F
+        =
+        f
+        (
+        G
+        )
+      
+    
+    {\displaystyle F=f(G)}
+   dipende dalla variabile casuale 
+  
+    
+      
+        G
+        =
+        g
+        (
+        H
+        )
+      
+    
+    {\displaystyle G=g(H)}
+  , che dipende da 
+  
+    
+      
+        H
+        =
+        h
+        (
+        X
+        )
+      
+    
+    {\displaystyle H=h(X)}
+  , che dipende a sua volta dalla variabile casuale 
+  
+    
+      
+        X
+      
+    
+    {\displaystyle X}
+  . Questo punto di vista è più comunemente riscontrato nel contesto dei modelli grafici.I due punti di vista sono in gran parte equivalenti. In entrambi i casi, per questa particolare architettura di rete, i componenti dei singoli strati sono indipendenti l'uno dall'altro (ad esempio, le componenti di 
+  
+    
+      
+        g
+      
+    
+    {\displaystyle g}
+   sono indipendenti l'una dall'altra, dato il loro ingresso 
+  
+    
+      
+        h
+      
+    
+    {\displaystyle h}
+  ). Questo, naturalmente, permette un certo grado di parallelismo nella costruzione del sistema.
+
+Reti, come ad esempio quelle precedenti vengono comunemente chiamate "feedforward", perché il loro è un grafico aciclico diretto. Reti con cicli (output diretto a unità dello stesso strato o dei precedenti) sono comunemente chiamate reti neurali ricorrenti. Tali reti sono comunemente raffigurate nel modo indicato nella parte superiore della Figura 2, dove la funzione 
+  
+    
+      
+        f
+      
+    
+    {\displaystyle f}
+   è mostrata come dipendente da se stessa. Tuttavia, vi è una dipendenza temporale implicita che non è possibile mostrare. Questo significa in pratica che il valore di 
+  
+    
+      
+        f
+      
+    
+    {\displaystyle f}
+   ad un certo punto nel tempo 
+  
+    
+      
+        t
+      
+    
+    {\displaystyle t}
+   dipende dai valori di 
+  
+    
+      
+        f
+      
+    
+    {\displaystyle f}
+   al tempo zero o su uno o più altri punti temporali. Il modello del grafico nella parte inferiore della Figura 2 illustra il caso in cui il valore di 
+  
+    
+      
+        f
+      
+    
+    {\displaystyle f}
+   al tempo 
+  
+    
+      
+        t
+      
+    
+    {\displaystyle t}
+   dipende solo dal suo valore precedente.
+Tuttavia la funzionalità più interessante di queste funzioni, ciò che ha attirato l'interesse e lo studio per la maggior parte delle reti neurali, è la possibilità di apprendimento, che in pratica significa la seguente:
+
+dato un compito specifico da risolvere, e una classe di funzioni 
+  
+    
+      
+        F
+      
+    
+    {\displaystyle F}
+  , apprendimento significa impiegare un set di osservazioni, al fine di trovare 
+  
+    
+      
+        
+          f
+          
+            ∗
+          
+        
+        ∈
+        F
+      
+    
+    {\displaystyle f^{*}\in F}
+   che risolve il problema in modo ottimale.Ciò comporta la definizione di una funzione di costo 
+  
+    
+      
+        C
+        :
+        F
+        →
+        
+          R
+        
+      
+    
+    {\displaystyle C:F\rightarrow \mathbb {R} }
+   tale che, per la soluzione ottimale 
+  
+    
+      
+        C
+        (
+        
+          f
+          
+            ∗
+          
+        
+        )
+        ≤
+        C
+        (
+        f
+        )
+      
+    
+    {\displaystyle C(f^{*})\leq C(f)}
+   
+  
+    
+      
+        ∀
+        f
+        ∈
+        F
+      
+    
+    {\displaystyle \forall f\in F}
+   nessuna soluzione ha un costo inferiore al costo della soluzione ottimale.
+La funzione di costo 
+  
+    
+      
+        C
+      
+    
+    {\displaystyle C}
+   è un concetto importante nell'apprendimento, poiché si tratta di una misura di quanto è lontana da noi la soluzione ottimale del problema che vogliamo risolvere. Quindi vi sono una serie di algoritmi di apprendimento che cercano nello spazio delle soluzioni al fine di trovare una funzione che abbia il minor costo possibile.
+Per applicazioni in cui la soluzione dipende da alcuni dati, il costo deve essere necessariamente funzione delle osservazioni.
+Mentre è possibile definire per alcune reti una funzione di costo ad hoc, spesso si può utilizzare una particolare funzione di costo poiché gode delle proprietà desiderate (ad esempio, la convessità), o perché proviene da una particolare formulazione del problema (vale a dire, in una formulazione probabilistica, la probabilità a posteriori del modello può essere utilizzata come l'inverso del costo). In ultima analisi, la funzione di costo dipenderà dal compito.
+
+
+=== Paradigmi di apprendimento ===
+Vi sono tre grandi paradigmi di apprendimento, ciascuno corrispondente ad un particolare compito astratto di apprendimento. Si tratta dell'apprendimento supervisionato, apprendimento non supervisionato e l'apprendimento per rinforzo. Di solito un tipo di architettura di rete può essere impiegato in qualsiasi di tali compiti.
+
+un apprendimento supervisionato (supervised learning), qualora si disponga di un insieme di dati per l'addestramento (o training set) comprendente esempi tipici di ingressi con le relative uscite loro corrispondenti: in tal modo la rete può imparare ad inferire la relazione che li lega. Successivamente, la rete è addestrata mediante un opportuno algoritmo (tipicamente, la backpropagation, che è appunto un algoritmo di apprendimento supervisionato), il quale usa tali dati allo scopo di modificare i pesi e altri parametri della rete stessa in modo tale da minimizzare l'errore di previsione relativo all'insieme di addestramento. Se l'addestramento ha successo, la rete impara a riconoscere la relazione incognita che lega le variabili di ingresso a quelle di uscita, ed è quindi in grado di fare previsioni anche laddove l'uscita non è nota a priori; in altri termini, l'obiettivo finale dell'apprendimento supervisionato è la previsione del valore dell'uscita per ogni valore valido dell'ingresso, basandosi soltanto su un numero limitato di esempi di corrispondenza (vale a dire, coppie di valori input-output). Per fare ciò, la rete deve essere infine dotata di un'adeguata capacità di generalizzazione, con riferimento a casi ad essa ignoti. Ciò consente di risolvere problemi di regressione o classificazione.
+un apprendimento non supervisionato (unsupervised learning), basato su algoritmi di addestramento che modificano i pesi della rete facendo esclusivamente riferimento ad un insieme di dati che include le sole variabili di ingresso. Tali algoritmi tentano di raggruppare i dati di ingresso e di individuare pertanto degli opportuni cluster rappresentativi dei dati stessi, facendo uso tipicamente di metodi topologici o probabilistici. L'apprendimento non supervisionato è anche impiegato per sviluppare tecniche di compressione dei dati.
+un apprendimento per rinforzo (reinforcement learning), nel quale un opportuno algoritmo si prefigge lo scopo di individuare un certo modus operandi, a partire da un processo di osservazione dell'ambiente esterno; ogni azione ha un impatto sull'ambiente, e l'ambiente produce una retroazione che guida l'algoritmo stesso nel processo di apprendimento. Tale classe di problemi postula un agente, dotato di capacità di percezione, che esplora un ambiente nel quale intraprende una serie di azioni. L'ambiente stesso fornisce in risposta un incentivo o un disincentivo, secondo i casi. Gli algoritmi per il reinforcement learning tentano in definitiva di determinare una politica tesa a massimizzare gli incentivi cumulati ricevuti dall'agente nel corso della sua esplorazione del problema. L'apprendimento con rinforzo differisce da quello supervisionato poiché non sono mai presentate delle coppie input-output di esempi noti, né si procede alla correzione esplicita di azioni subottimali. Inoltre, l'algoritmo è focalizzato sulla prestazione in linea, la quale implica un bilanciamento tra esplorazione di situazioni ignote e sfruttamento della conoscenza corrente.
+
+
+=== Apprendimento hebbiano ===
+L'algoritmo di apprendimento hebbiano (1984) si basa sul semplice principio che se due neuroni si attivano contemporaneamente, la loro interconnessione deve essere rafforzata.
+
+  
+    
+      
+        Δ
+        
+          w
+          
+            i
+          
+        
+        =
+        η
+        
+          x
+          
+            i
+            n
+            ,
+            i
+          
+        
+        
+          x
+          
+            o
+            u
+            t
+          
+        
+      
+    
+    {\displaystyle \Delta w_{i}=\eta x_{in,i}x_{out}}
+   dove 
+  
+    
+      
+        
+          x
+          
+            i
+            n
+            ,
+            i
+          
+        
+      
+    
+    {\displaystyle x_{in,i}}
+  ,
+dove 
+  
+    
+      
+        i
+      
+    
+    {\displaystyle i}
+   è l'
+  
+    
+      
+        
+          i
+          
+            m
+            o
+          
+        
+      
+    
+    {\displaystyle i^{mo}}
+   ingresso e 
+  
+    
+      
+        η
+      
+    
+    {\displaystyle \eta }
+   è il tasso di apprendimento 
+  
+    
+      
+        (
+        0
+        <
+        η
+        ≤
+        1
+        )
+      
+    
+    {\displaystyle (0<\eta \leq 1)}
+  .
+La regola di Hebb è la seguente: l'efficacia di una particolare sinapsi cambia se e solo se c'è un'intensa attività simultanea dei due neuroni, con un'alta trasmissione di input nella sinapsi in questione.
+Esempio di procedura:
+
+Inizializza i pesi a zero.
+Prepara un pattern di ingresso a cui corrisponde un pattern di uscita noto.
+Calcola 
+  
+    
+      
+        Δ
+        
+          w
+          
+            i
+          
+        
+        =
+        η
+        
+          x
+          
+            i
+            n
+            ,
+            i
+          
+        
+        
+          x
+          
+            o
+            u
+            t
+          
+        
+      
+    
+    {\displaystyle \Delta w_{i}=\eta x_{in,i}x_{out}}
+   e quindi aggiorna 
+  
+    
+      
+        
+          w
+          
+            i
+          
+        
+        =
+        
+          w
+          
+            i
+          
+        
+        +
+        Δ
+        
+          w
+          
+            i
+          
+        
+      
+    
+    {\displaystyle w_{i}=w_{i}+\Delta w_{i}}
+  .
+Ripeti i passi 2 e 3 per ogni pattern 
+  
+    
+      
+        j
+      
+    
+    {\displaystyle j}
+   noto 
+  
+    
+      
+        
+          w
+          
+            i
+          
+        
+        =
+        
+          ∑
+          
+            j
+          
+        
+        
+          (
+          Δ
+          
+            w
+            
+              i
+            
+          
+          )
+          j
+        
+      
+    
+    {\displaystyle w_{i}=\sum _{j}{(\Delta w_{i})j}}
+  In questo modo le connessioni possono solo irrobustirsi.
+Le connessioni si considerano irrobustite quando le unità presinaptica e postsinaptica sono d'accordo, altrimenti si indeboliscono.
+Si considerano funzioni bipolari (-1,1) invece che booleane (0,1).
+
+
+== Teoria e funzionamento ==
+
+
+=== Funzionamento di una rete neurale feedforward ===
+Le reti neurali si basano principalmente sulla simulazione di neuroni artificiali opportunamente collegati. Il modello rappresentato in figura è quello proposto da McCulloch e Pitts.
+
+I suddetti neuroni ricevono in ingresso degli stimoli e li elaborano. L'elaborazione può essere anche molto sofisticata ma in un caso semplice si può pensare che i singoli ingressi vengano moltiplicati per un opportuno valore detto peso, il risultato delle moltiplicazioni viene sommato e se la somma supera una certa soglia il neurone si attiva attivando la sua uscita. Il peso indica l'efficacia sinaptica della linea di ingresso e serve a quantificarne l'importanza, un ingresso molto importante avrà un peso elevato, mentre un ingresso poco utile all'elaborazione avrà un peso inferiore. Si può pensare che se due neuroni comunicano fra loro utilizzando maggiormente alcune connessioni allora tali connessioni avranno un peso maggiore, fino a che non si creeranno delle connessioni tra l'ingresso e l'uscita della rete che sfruttano "percorsi preferenziali". Tuttavia è sbagliato pensare che la rete finisca col produrre un unico percorso di connessione: tutte le combinazioni infatti avranno un certo peso, e quindi contribuiscono al collegamento ingresso/uscita.
+Il modello in figura rappresenta una classica rete neurale pienamente connessa.
+
+I singoli neuroni vengono collegati alla schiera di neuroni successivi, in modo da formare una rete di neuroni. Normalmente una rete è formata da tre strati. Nel primo abbiamo gli ingressi (I), questo strato si preoccupa di trattare gli ingressi in modo da adeguarli alle richieste dei neuroni. Se i segnali in ingresso sono già trattati può anche non esserci. Il secondo strato è quello nascosto (H, hidden), si preoccupa dell'elaborazione vera e propria e può essere composto anche da più colonne di neuroni. Il terzo strato è quello di uscita (O) e si preoccupa di raccogliere i risultati e adattarli alle richieste del blocco successivo della rete neurale. Queste reti possono essere anche molto complesse e coinvolgere migliaia di neuroni e decine di migliaia di connessioni.
+Per costruire la struttura di una rete neurale multistrato si possono inserire 
+  
+    
+      
+        N
+      
+    
+    {\displaystyle N}
+   strati hidden. L'efficacia di generalizzare di una rete neurale multistrato dipende ovviamente dall'addestramento che ha ricevuto e dal fatto di essere riuscita o meno ad entrare in un minimo locale buono.
+
+
+=== Algoritmo di retropropagazione dell'errore ===
+L'algoritmo di retropropagazione dell'errore (backpropagation) è utilizzato nell'apprendimento con supervisione. Esso permette di modificare i pesi delle connessioni in modo tale che si minimizzi una certa funzione errore E. Tale funzione dipende dal vettore h-esimo di output 
+  
+    
+      
+        
+          
+            
+              
+                o
+                u
+                t
+              
+              ¯
+            
+          
+          
+            h
+          
+        
+      
+    
+    {\displaystyle {\overline {out}}^{h}}
+   restituito dalla rete, dato il vettore h-esimo di ingresso 
+  
+    
+      
+        
+          
+            
+              x
+              ¯
+            
+          
+          
+            h
+          
+        
+      
+    
+    {\displaystyle {\overline {x}}^{h}}
+   e dal vettore h-esimo di output 
+  
+    
+      
+        
+          
+            
+              y
+              ¯
+            
+          
+          
+            h
+          
+        
+      
+    
+    {\displaystyle {\overline {y}}^{h}}
+  che noi desideriamo (che fa parte del training set). Il training set è dunque un insieme di N coppie di vettori 
+  
+    
+      
+        (
+        
+          
+            
+              x
+              ¯
+            
+          
+          
+            h
+          
+        
+        ,
+        
+          
+            
+              y
+              ¯
+            
+          
+          
+            h
+          
+        
+        )
+      
+    
+    {\displaystyle ({\overline {x}}^{h},{\overline {y}}^{h})}
+  , con 
+  
+    
+      
+        h
+        =
+        1
+        ,
+        .
+        .
+        .
+        ,
+        N
+      
+    
+    {\displaystyle h=1,...,N}
+  . La funzione errore che si deve minimizzare si può scrivere come:
+
+  
+    
+      
+        E
+        (
+        w
+        )
+        =
+        
+          
+            1
+            2
+          
+        
+        
+          ∑
+          
+            h
+          
+        
+        
+          ∑
+          
+            k
+          
+        
+        (
+        o
+        u
+        
+          t
+          
+            k
+          
+          
+            h
+          
+        
+        −
+        
+          y
+          
+            k
+          
+          
+            h
+          
+        
+        
+          )
+          
+            2
+          
+        
+      
+    
+    {\displaystyle E(w)={\frac {1}{2}}\sum _{h}\sum _{k}(out_{k}^{h}-y_{k}^{h})^{2}}
+  
+dove l'indice k rappresenta il valore corrispondente al k-esimo neurone di output. E(w) è una funzione dipendente dai pesi (che in generale variano nel tempo), per minimizzarla si può usare l'algoritmo della discesa del gradiente (gradient descent). L'algoritmo parte da un punto generico 
+  
+    
+      
+        
+          
+            x
+            ¯
+          
+        
+        (
+        0
+        )
+      
+    
+    {\displaystyle {\overline {x}}(0)}
+   e calcola il gradiente 
+  
+    
+      
+        ∇
+        f
+        (
+        
+          
+            
+              x
+              ¯
+            
+          
+          
+            0
+          
+        
+        )
+      
+    
+    {\displaystyle \nabla f({\overline {x}}^{0})}
+  . Il gradiente dà la direzione verso cui muoversi lungo la quale si ha il massimo incremento (o decremento se considero 
+  
+    
+      
+        −
+        ∇
+      
+    
+    {\displaystyle -\nabla }
+  ). Definita la direzione ci si muove di una distanza 
+  
+    
+      
+        η
+      
+    
+    {\displaystyle \eta }
+   predefinita a priori e si trova un nuovo punto 
+  
+    
+      
+        
+          
+            x
+            ¯
+          
+        
+        (
+        1
+        )
+      
+    
+    {\displaystyle {\overline {x}}(1)}
+   sul quale è calcolato nuovamente il gradiente. Si continua iterativamente finché il gradiente non è nullo.
+L'algoritmo di backpropagation può essere diviso in due passi:
+
+Forward pass: l'input dato alla rete è propagato al livello successivo e così via ai livelli successivi (il flusso di informazioni si sposta in avanti, cioè forward). Si calcola dunque E(w), l'errore commesso.
+Backward pass: l'errore fatto dalla rete è propagato all'indietro (backward) e i pesi sono aggiornati in maniera appropriata.I passi logici per addestrare una rete neurale con apprendimento supervisionato sono i seguenti:
+
+creare un insieme di pattern input e il relativo insieme di pattern di output desiderati;
+inizializzare i pesi della rete neurale (le connessioni tra i neuroni) a dei valori casuali, piccoli rispetto ai valori futuri che assumeranno, e a norma nulla;
+ciclo di apprendimento (esce da questo ciclo solo quando l'errore generale è minore di quanto si è deciso oppure dopo un determinato numero di iterazioni):
+Ciclo feedforward (dallo strato di input a quello di output):
+estrarre un pattern di input a caso tra quelli a disposizione:
+calcolare il valore di tutti i neuroni successivi (sommatorie di produttorie);
+detrarre dal risultato il valore di soglia di attivazione del neurone (se il valore di soglia non è già stato simulato con l'aggiunta di un neurone a ingresso fisso a valore 1.0);
+filtrare l'uscita del neurone applicando una funzione logistica per far diventare tale valore input del neurone successivo;
+confrontare il risultato ottenuto della rete con il pattern di output relativo all'input inserito e ricavare l'errore attuale della rete;
+ciclo di backpropagation (dallo strato di output a quello di input):
+calcolare la correzione da apportare ai pesi secondo la regola di localizzazione del minimo scelta;
+applicare la correzione ai pesi dello strato;Per l'addestramento di reti neurali profonde, impiegando dataset molto vasti, la discesa del gradiente classica risulta computazionalmente proibitiva, per cui nell'ottimizzare i parametri del modello si fa tipicamente uso dell'algoritmo di discesa stocastica del gradiente.
+
+
+== Tipi di rete neurale ==
+
+
+=== Reti di Hopfield ===
+
+Nel 1982, il fisico John J. Hopfield pubblica un articolo fondamentale in cui presenta un modello matematico comunemente noto appunto come rete di Hopfield: tale rete si distingue per "l'emergere spontaneo di nuove capacità computazionali dal comportamento collettivo di un gran numero di semplici elementi di elaborazione". Le proprietà collettive del modello producono una memoria associativa per il riconoscimento di configurazioni corrotte e il recupero di informazioni mancanti.
+Inoltre, Hopfield ritiene che ogni sistema fisico possa essere considerato come un potenziale dispositivo di memoria, qualora esso disponga di un certo numero di stati stabili, i quali fungano da attrattore per il sistema stesso. Sulla base di tale considerazione, egli si spinge a formulare la tesi secondo cui la stabilità e la collocazione di tali attrattori sono proprietà spontanee di sistemi costituiti, come accennato, da considerevoli quantità di neuroni reciprocamente interagenti.
+Le applicazioni delle reti di Hopfield riguardano principalmente la realizzazione di memorie associative, resistenti all'alterazione delle condizioni operative, e la soluzione di problemi di ottimizzazione combinatoriale.
+Da un punto di vista strutturale, la rete di Hopfield costituisce una rete neurale ricorrente simmetrica, di cui è garantita la convergenza.
+Una rete ricorrente è un modello neurale in cui è presente un flusso bidirezionale di informazioni; in altri termini, mentre nelle reti di tipo feedforward la propagazione dei segnali avviene unicamente, in maniera continua, nella direzione che conduce dagli ingressi alle uscite, nelle reti ricorrenti tale propagazione può anche manifestarsi da uno strato neurale successivo ad uno precedente, oppure tra neuroni appartenenti ad uno stesso strato, e persino tra un neurone e sé stesso.
+
+
+=== Reti di Elman ===
+Un significativo e noto esempio di semplice rete ricorrente è dovuto a Jeffrey L. Elman (1990). Essa costituisce una variazione sul tema del percettrone multistrato, con esattamente tre strati e l'aggiunta di un insieme di neuroni "contestuali" nello strato di ingresso. Le connessioni retroattive si propagano dallo strato intermedio (e nascosto) a tali unità contestuali, alle quali si assegna peso costante e pari all'unità.
+In ciascun istante, gli ingressi si propagano nel modo tradizionale e tipico delle reti feedforward, compresa l'applicazione dell'algoritmo di apprendimento (solitamente la backpropagation). Le connessioni retroattive fisse hanno come effetto quello di mantenere una copia dei precedenti valori dei neuroni intermedi, dal momento che tale flusso avviene sempre prima della fase di apprendimento.
+In questo modo la rete di Elman tiene conto del suo stato precedente, cosa che le consente di svolgere compiti di previsione di sequenze temporali che sono difficilmente alla portata dei percettroni multistrato convenzionali.
+
+
+=== Mappe auto-organizzanti o reti SOM (Self-Organizing Maps) ===
+
+Infine, un ultimo interessante tipo di rete è costituita dalla cosiddetta mappa auto-organizzante o rete SOM (Self-Organizing Map). Tale innovativo tipo di rete neurale è stata elaborata da Teuvo Kohonen dell'Università Tecnologica di Helsinki; il suo algoritmo di apprendimento è senza dubbio una brillante formulazione di apprendimento non supervisionato, e ha dato luogo a un gran numero di applicazioni nell'ambito dei problemi di classificazione. Una mappa o rete SOM è basata essenzialmente su un reticolo o griglia di neuroni artificiali i cui pesi sono continuamente adattati ai vettori presentati in ingresso nel relativo insieme di addestramento. Tali vettori possono essere di dimensione generica, anche se nella maggior parte delle applicazioni essa è piuttosto alta. Per ciò che riguarda le uscite della rete, al contrario, ci si limita di solito ad una dimensione massima pari a tre, il che consente di dare luogo a mappe 2D o 3D.
+In termini più analitici, l'algoritmo può essere agevolmente descritto, come accennato, nei termini di un insieme di neuroni artificiali, ciascuno con una precisa collocazione sulla mappa rappresentativa degli output, che prendono parte ad un processo noto come winner takes all ("Il vincitore piglia tutto"), al termine del quale il nodo avente un vettore di pesi più vicino ad un certo input è dichiarato vincitore, mentre i pesi stessi sono aggiornati in modo da avvicinarli al vettore in ingresso. Ciascun nodo ha un certo numero di nodi adiacenti. Quando un nodo vince una competizione, anche i pesi dei nodi adiacenti sono modificati, secondo la regola generale che più un nodo è lontano dal nodo vincitore, meno marcata deve essere la variazione dei suoi pesi. Il processo è quindi ripetuto per ogni vettore dell'insieme di training, per un certo numero, solitamente grande, di cicli. Va da sé che ingressi diversi producono vincitori diversi.
+Operando in tal modo, la mappa riesce alfine ad associare i nodi di uscita con i gruppi o schemi ricorrenti nell'insieme dei dati in ingresso. Se questi schemi sono riconoscibili, essi possono essere associati ai corrispondenti nodi della rete addestrata. In maniera analoga a quella della maggioranza delle reti neurali artificiali, anche la mappa o rete SOM può operare in due distinte modalità:
+
+durante la fase di addestramento si costruisce la mappa, pertanto la rete si configura e organizza tramite un processo competitivo. Alla rete deve essere fornito il numero più grande possibile di vettori in ingresso, tali da rappresentare fedelmente il tipo di vettore che le sarà eventualmente sottoposta nella seconda fase;
+nel corso della seconda fase ogni nuovo vettore di ingresso può essere velocemente classificato o categorizzato, collocandolo in automatico sulla mappa ottenuta nella fase precedente. Vi sarà sempre "un unico neurone vincente", quello il cui vettore dei pesi giace a minor distanza dal vettore appena sottoposto alla rete; tale neurone può essere determinato semplicemente calcolando la distanza euclidea tra i due vettori in questione.
+
+
+=== Reti ad attrattori ===
+In generale una ANN (Attractor Neural Network) è una rete di nodi (es: biologicamente ispirati), spesso interconnessi in modo ricorsivo, la cui dinamica nel tempo stabilisce un assestamento in un particolare modo di oscillazione. Questo modo di oscillazione può essere stazionario, variante nel tempo o di tipo stocastico ed è chiamato il suo 'attrattore'. In neuroscienza teorica diversi tipi di reti ad attrattori sono state associate a differenti funzioni, come: memoria, attenzione, condotta del moto e classificazione.
+Più precisamente, una rete ad attrattori è una rete di N nodi connessi in modo che la loro intera dinamica diventi stabile in uno spazio D dimensionale, dove solitamente N>>D. Ciò assume che non vi sia più input dall'esterno del sistema. La stabilità nello stato ad attrattore indica l'esistenza di uno stato stabile in una qualche varietà algebrica (es: linea, cerchio, piano, toroide).
+
+
+== Applicazioni e proprietà ==
+L'utilità dei modelli di rete neurale sta nel fatto che queste possono essere usate per comprendere una funzione utilizzando solo le osservazioni sui dati. Ciò è particolarmente utile nelle applicazioni in cui la complessità dei dati o la difficoltà di elaborazione rende la progettazione di una tale funzione impraticabile con i normali procedimenti di analisi manuale.
+I compiti a cui le reti neurali sono applicate possono essere classificati nelle seguenti grandi categorie di applicazioni:
+
+funzioni di approssimazione, o di regressione, tra cui la previsione di serie temporali e la modellazione;
+classificazione, compresa la struttura e la sequenza di generici riconoscimenti, l'individuazione delle novità e il processo decisionale;
+l'elaborazione dei dati, compreso il "filtraggio" (eliminazione del rumore), il clustering, separazione di segnali e compressione.Le aree di applicazione includono i sistemi di controllo (controllo di veicoli, controllo di processi), i simulatori di giochi e i processi decisionali (backgammon, scacchi), riconoscimento di pattern (sistemi radar, identificazione di volti, riconoscimento di oggetti, ecc), riconoscimenti di sequenze (riconoscimento di gesti, riconoscimento vocale, OCR), diagnosi medica, applicazioni finanziarie, data mining, filtri spam per e-mail.
+
+
+=== Pregi ===
+Le reti neurali, per come sono costruite, lavorano in parallelo e sono quindi in grado di trattare molti dati. Si tratta in sostanza di un sofisticato sistema di tipo statistico dotato di una buona immunità al rumore; se alcune unità del sistema dovessero funzionare male, la rete nel suo complesso avrebbe delle riduzioni di prestazioni ma difficilmente andrebbe incontro ad un blocco del sistema. I software di ultima generazione dedicati alle reti neurali richiedono comunque buone conoscenze statistiche; il grado di apparente utilizzabilità immediata non deve trarre in inganno, pur permettendo all'utente di effettuare subito previsioni o classificazioni, seppure con i limiti del caso.
+Da un punto di vista industriale, risultano efficaci quando si dispone di dati storici che possono essere trattati con gli algoritmi neurali. Ciò è di interesse per la produzione perché permette di estrarre dati e modelli senza effettuare ulteriori prove e sperimentazioni.
+
+
+=== Difetti ===
+I modelli prodotti dalle reti neurali, anche se molto efficienti, non sono spiegabili in linguaggio simbolico umano: i risultati vanno accettati "così come sono", da cui anche la definizione inglese delle reti neurali come "black box". In altre parole, a differenza di un sistema algoritmico, dove si può esaminare passo-passo il percorso che dall'input genera l'output, una rete neurale è in grado di generare un risultato valido, o comunque con un'alta probabilità di essere accettabile, ma non è possibile spiegare come e perché tale risultato sia stato generato.
+Come per qualsiasi algoritmo di modellazione, anche le reti neurali sono efficienti solo se le variabili predittive sono scelte con cura.
+Questi modelli non sono in grado di trattare in modo efficiente variabili di tipo categorico (per esempio, il nome della città) con molti valori diversi. Necessitano di una fase di addestramento del sistema che fissi i pesi dei singoli neuroni e questa fase può richiedere molto tempo, se il numero dei record e delle variabili analizzate è molto grande. Non esistono teoremi o modelli che permettano di definire la rete ottima, quindi la riuscita di una rete dipende molto dall'esperienza del creatore.
+
+
+=== Utilizzi ===
+Le reti neurali vengono solitamente usate in contesti dove i dati possono essere parzialmente errati oppure dove non esistano modelli analitici in grado di affrontare il problema. Un loro tipico utilizzo è nei software di OCR, nei sistemi di riconoscimento facciale e più in generale nei sistemi che si occupano di trattare dati soggetti a errori o rumore. Esse sono anche uno degli strumenti maggiormente utilizzati nelle analisi di data mining.
+Le reti neurali vengono anche utilizzate come mezzo per previsioni nell'analisi finanziaria o meteorologica. Negli ultimi anni è aumentata notevolmente la loro importanza anche nel campo della bioinformatica nel quale vengono utilizzate per la ricerca di pattern funzionali e/o strutturali in proteine e acidi nucleici. Mostrando opportunamente una lunga serie di input (fase di training o apprendimento), la rete è in grado di fornire l'output più probabile. Negli ultimi anni inoltre sono in corso studi per il loro utilizzo nella previsione degli attacchi Epilettici (Analisi dei Dati provenienti dall' EEG).
+Recenti studi hanno dimostrato buone potenzialità delle reti neurali in sismologia per la localizzazione di epicentri di terremoti e predizione della loro intensità.
+
+
+== Note ==
+
+
+== Bibliografia ==
+Ernesto Burattini e Roberto Cordeschi, Intelligenza Artificiale, Roma, Carocci, ISBN 88-430-2011-0
+Patarnello S., Le reti neuronali, Milano, Franco Angeli, 1991. ISBN 978-88-204-6819-4
+Giampiero Fabbri e Raimondello Orsini, Reti neurali per le scienze economiche, Franco Muzzio editore, 1993. ISBN 88-7021-656-X
+Meraviglia C., Le reti neurali nella ricerca sociale, Bologna, Il Mulino, 2001. ISBN 978-88-464-3044-1
+Floreano D., Mattiussi C., Manuale sulle reti neurali, Bologna, Il Mulino, 2002. ISBN 978-88-15-08504-7
+Pessa E., Statistica con le reti neurali, Roma, Di Renzo Editore, 2004. ISBN 978-88-8323-074-5
+Gallo C., Reti neurali artificiali: teoria ed applicazioni finanziarie, 2007 Foggia, Università di Foggia.
+ Alessandro Mazzetti, Reti neurali artificiali, Apogeo, 1991, ISBN 88-7303-002-5.
+(EN)  Amit, D. J., Modeling brain function, 1989 New York, NY: Cambridge University Press. ISBN 0-521-36100-1
+
+
+== Voci correlate ==
+EDLUT
+Apprendimento automatico
+Rete neurale feed-forward
+Rete neurale convoluzionale
+Rete neurale ricorrente
+Rete neurale a base radiale
+Rete neurale spiking
+Ingegneria neuromorfica
+
+
+== Altri progetti ==
+
+ Wikimedia Commons contiene immagini o altri file sulle reti neurali artificiali
+
+
+== Collegamenti esterni ==
+
+ Domenico Parisi, RETI NEURALI E ROBOTICA, in XXI secolo, Istituto dell'Enciclopedia Italiana, 2009-2010. 
+(EN) Opere riguardanti Rete neurale artificiale, su Open Library, Internet Archive. 
+ Programma da scaricare e provare che mostra come una rete neurale apprende dagli input. (è disponibile anche un video), su e-nuts.net.
+ Esempio di rete neurale realizzata in Matlab, su cash-cow.it.
+ Descrizione del funzionamento di una rete neurale di tipo feed-forward, su skenz.it.
+ Esempio di un neurone e di una rete neurale realizzato in C#, su xleox.somee.com. URL consultato il 26 giugno 2016 (archiviato dall'url originale il 30 giugno 2016).
+		</div>
+		<div class="page_summary" style="margin-top: 3vh;">
+			Nel campo dell'apprendimento automatico, una rete neurale artificiale (in inglese artificial neural network, abbreviato in ANN o anche come NN) è un modello computazionale composto di "neuroni" artificiali, ispirato vagamente alla semplificazione di una rete neurale biologica.
+Questi modelli matematici sono troppo semplici per ottenere una comprensione delle reti neurali biologiche, ma sono utilizzati per tentare di risolvere problemi ingegneristici di intelligenza artificiale come quelli che si pongono in diversi ambiti tecnologici (in elettronica, informatica, simulazione, e altre discipline).
+Una rete neurale artificiale può essere realizzata sia da programmi software che da hardware dedicato (DSP, Digital Signal Processing). Questa branca può essere utilizzata in congiunzione alla logica fuzzy.
+
+
+		</div>
+	</body>
+</html>

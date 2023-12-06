@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html class="client" lang="it">
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			Velocità di trasmissione
+		</title>
+	</head>
+	<body>
+		<div class="page_content">
+			Лабораторная 2
+			<hr/>
+			In informatica e telecomunicazioni, la velocità di trasmissione (o di trasferimento, detta anche frequenza di cifra o bit-rate) è la grandezza indicante la quantità di informazione trasferita attraverso un canale di comunicazione in un dato intervallo di tempo.
+L'unità di misura associata è il bit per secondo.
+
+
+== Descrizione ==
+Nel campo informatico delle reti informatiche, la velocità di trasmissione è anche detta banda, sebbene a rigore nell'ambito della trasmissione questa indichi solamente l'intervallo di frequenze, misurato dall'ampiezza di banda B in Hz, in cui il canale trasmette, mentre la velocità di trasmissione, espressa in bit/s, è proporzionale a tale banda B a mezzo del parametro noto come efficienza spettrale. La velocità di trasmissione (massima o relativa) dipende dal tipo di mezzo trasmissivo utilizzato e dalle sue condizioni fisiche al momento d'uso (interferenze, saturazione, etc.), rappresentando di fatto una risorsa limitata e in molti casi anche condivisa tra più utenti con le usuali tecniche di multiplazione/accesso multiplo.
+La velocità di trasmissione viene solitamente utilizzata per riferirsi allo scambio di informazione tra computer o in generale dispositivi elettronici come apparati di ricetrasmissione di telecomunicazioni ed è considerata un fattore prestazionale del sistema di telecomunicazioni o apparato hardware elettronico, particolarmente sentito dall'utente come parametro di qualità di servizio. In particolare, in telecomunicazioni, la velocità massima di trasmissione è detta anche capacità di trasmissione della linea (capacità di canale), mentre la quantità di informazione trasportata in un certo momento su un canale, minore o uguale alla capacità, è detta portata del canale (throughput) e dipende esclusivamente da quanta informazione è immessa sul canale nella trasmissione. In altre parole, mentre il throughput è deciso dal mittente, cioè è una specifica di trasmissione, la velocità massima sul canale è invece una costante della linea. Quando un apparato elettronico immette dati in un link alla velocità massima supportata dal link stesso, cioè alla sua capacità massima, si dice che l'elaborazione e la successiva trasmissione è wire speed. Siccome in questi apparati o sistemi di comunicazione l'informazione viene memorizzata e viaggia in forma digitale, ovvero è sostanzialmente una sequenza di bit, è naturale che tale velocità venga misurata in bit per secondo (e da qui il termine equivalente inglese bit rate). Nelle trasmissioni analogiche, pur non essendo definito il bit-rate, non essendo l'informazione trasportata in forma digitale, è possibile ricorrere concettualmente a un bit-rate equivalente, preservando così il concetto di velocità di trasmissione anche per tali tipo di trasmissioni.
+In una trasmissione digitale, la velocità di trasmissione può essere costante oppure variabile in dipendenza dell'effettiva emissione di informazione da parte della rispettiva sorgente di informazione: si distinguono così sorgenti CBR (constant bit rate) e VBR (variable bit rate): le prime rappresentano il caso della fonia digitalizzata, le seconde sono quelle proprie di un flusso video digitale dove si alternano generalmente immagini a basso movimento e colore abbastanza uniforme a immagini ad alto movimento e colore estremamente vario, con audio associato intermittente. La velocità di trasmissione massima necessaria per trasportare flussi multimediali o solamente video è sempre molto maggiore della velocità di trasmissione massima per trasportare il solo flusso vocale a causa della differente quantità di informazione tra i due flussi. Tecniche di compressione dati (ovvero codifica di sorgente) sono in grado di abbassare, anche notevolmente, la velocità di trasmissione effettiva necessaria alla trasmissione per tutte le tipologie di flussi dati.
+
+
+=== Teoremi di Shannon e Nyquist ===
+I canali trasmissivi utilizzati per la comunicazione dei dispositivi si suddividono in:
+
+Canali ideali: non causano distorsioni o ritardi nella propagazione dei segnali.
+Canali non distorcenti: causano solo un ritardo costante nella propagazione e un'attenuazione costante in banda.
+Canali distorcenti: causano attenuazioni e ritardi, in funzione della frequenza dei segnali.Esistono vari teoremi che esprimono la massima velocità di trasmissione per ciascun tipo di canale.
+Il legame tra la velocità di trasmissione e larghezza di banda discende direttamente dalla Condizione di Nyquist
+
+  
+    
+      
+        R
+        =
+        2
+        B
+        ⋅
+        
+          log
+          
+            2
+          
+        
+        ⁡
+        M
+      
+    
+    {\displaystyle R=2B\cdot \log _{2}M}
+   [bit/s]
+dove B è la larghezza di banda del canale e M il numero di distinti valori che può assumere ogni simbolo trasmesso.
+La capacità di canale, ovvero la massima velocità alla quale è possibile trasmettere senza errore, è dato dal Teorema di Shannon-Hartley, indicato di seguito, che considera anche il rumore additivo gaussiano bianco (per esempio il rumore termico):
+
+  
+    
+      
+        C
+        =
+        B
+        ⋅
+        
+          log
+          
+            2
+          
+        
+        ⁡
+        
+          (
+          
+            1
+            +
+            
+              
+                S
+                N
+              
+            
+          
+          )
+        
+      
+    
+    {\displaystyle C=B\cdot \log _{2}\left(1+{\frac {S}{N}}\right)}
+   [bit/s]
+Dove B è la larghezza di banda del canale, S e N sono, rispettivamente, la potenza del segnale e del rumore del canale.
+
+
+=== Decadimento con la distanza ===
+Nella pratica la capacità di un canale in termini di bit-rate diminuisce con la distanza d dall'emettitore del flusso informativo a causa dell'attenuazione del segnale utile cioè quindi per la diminuzione del SNR secondo lo stesso Teorema di Shannon. Con questo fatto si spiega almeno in parte il motivo per cui molte volte la banda larga di connessione in collegamento ADSL su rete Internet è inferiore a quella stipulata per contratto con il provider ISP ignorando invece l'effettiva distanza dell'utente dalla prima centrale telefonica nell'ultimo miglio della rete. In tal senso il provider dovrebbe allora fornire una banda minima garantita per contratto. In particolare tale decadimento è circa lineare con la distanza. Infatti approssimando la relazione della velocità di trasmissione con:
+
+  
+    
+      
+        C
+        =
+        B
+        ⋅
+        
+          log
+          
+            2
+          
+        
+        ⁡
+        
+          (
+          
+            
+              S
+              N
+            
+          
+          )
+        
+      
+    
+    {\displaystyle C=B\cdot \log _{2}\left({\frac {S}{N}}\right)}
+  
+e considerando la potenza di segnale utile S in funzione della distanza x ovvero 
+  
+    
+      
+        S
+        =
+        
+          S
+          
+            0
+          
+        
+        ∗
+        e
+        x
+        p
+        (
+        −
+        k
+        x
+        )
+      
+    
+    {\displaystyle S=S_{0}*exp(-kx)}
+  con So potenza iniziale e k attenuazione specifica del mezzo trasmissivo, utilizzando le proprietà dei logaritmi si ottiene:
+
+  
+    
+      
+         
+        C
+        =
+        B
+        
+          /
+        
+        l
+        o
+        
+          g
+          
+            e
+          
+        
+        (
+        2
+        )
+        ∗
+        [
+        
+          −
+          k
+          x
+          +
+          l
+          o
+          
+            g
+            
+              e
+            
+          
+          (
+          
+            S
+            
+              0
+            
+          
+          )
+          −
+          l
+          o
+          
+            g
+            
+              e
+            
+          
+          (
+          N
+          )
+        
+        ]
+      
+    
+    {\displaystyle \ C=B/log_{e}(2)*[{-kx+log_{e}(S_{0})-log_{e}(N)}]}
+  
+ovvero:
+
+  
+    
+      
+         
+        C
+        =
+        (
+        B
+        
+          /
+        
+        c
+        o
+        s
+        t
+        )
+        ∗
+        [
+        
+          −
+          k
+          x
+          +
+          c
+          o
+          s
+          t
+        
+        ]
+      
+    
+    {\displaystyle \ C=(B/cost)*[{-kx+cost}]}
+  
+essendo i restanti valori delle costanti, da cui quindi la dipendenza lineare negativa con la distanza x.
+Se si inverte la relazione rispetto a x si ottiene:
+
+  
+    
+      
+         
+        x
+        =
+        c
+        o
+        s
+        t
+        
+          /
+        
+        k
+        −
+        C
+        ∗
+        c
+        o
+        s
+        t
+        
+          /
+        
+        k
+        B
+      
+    
+    {\displaystyle \ x=cost/k-C*cost/kB}
+  
+da cui si evince che la distanza servibile in una comunicazione aumenta al diminuire della velocità di trasmissione e viceversa diminuisce all'aumentare della velocità.
+Questo fatto ha un'importanza notevole sui sistemi/tecniche di trasmissione dati nell'ultimo miglio della rete telefonica o rete di accesso quali le varie forme o tecnologie DSL: tanto più si è vicini all'utente tanto più è possibile sfruttare tecnologie DSL a più alta capacità di trasmissione.
+
+
+== Unità di misura ==
+
+Dal punto di vista dell'analisi dimensionale la velocità di trasmissione è definita come rapporto tra quantità di informazione e tempo.
+Ne segue per analogia che l'unità di misura base è il Bit per Secondo (bps o bit/s) o equivalenti.In realtà sulle veloci macchine moderne avrebbe poco senso usare come unità di misura proprio il bit/secondo, per cui vengono utilizzati principalmente i vari multipli del bit secondo i prefissi standard del sistema decimale, cosicché, ad esempio, se in una linea ADSL abbiamo un trasferimento dati di 4 Mbit/s, cioè 4.000.000 bit/s, avremo (4.000.000/8) B/s equivalenti a 500 kB/s. I multipli dell'unità di misura base sono leggermente differenti nei due casi, sebbene indicati dagli stessi prefissi (le lettere k, M, G e T del sistema internazionale). In ambito informatico si utilizzano da sempre approssimazioni basate sulle potenze del 2 (il numero su cui si basa l'aritmetica binaria del calcolatore), mentre in telecomunicazioni ci si attiene allo standard.
+Il bisogno di utilizzare questi prefissi risulta evidente se si pensa che ad esempio lo standard USB 2.0 può raggiungere velocità di 480 Mbit/s, equivalenti a 60 MB/s.
+
+
+== Misurazione ==
+La misurazione della velocità di trasmissione, nel caso di una connessione Internet, può essere eseguita sia manualmente facendo un download di un file di dimensioni note in bit, verificando il tempo di scaricamento (vedere paragrafo Esempio di applicazione), confrontando eventualmente i risultati con le potenzialità teoriche della Rete in base al contratto di servizio stipulato con l'ISP; altri metodi automatici consistono nell'affidare tale operazione ad appositi siti web esterni tipicamente appoggiandosi a server web dedicati (speed test).
+In Italia il test di misura ufficiale per eccellenza è Misura Internet, offerto dall'AGCOM sotto la supervisione della Fondazione Ugo Bordoni e dell'ISCOM, attraverso il software Ne.me.sys. e valido a livello legale per eventuali reclami contro i provider di rete.
+
+
+== Relazioni con altre grandezze ==
+
+
+=== Velocità di segnalazione ===
+
+La velocità di segnalazione, detta anche symbol rate o baud rate, è una grandezza di dimensioni simili ma ben distinta dalla velocità di trasmissione (bit rate), della quale è generalmente multipla.
+Spesso il termine baud rate viene usato impropriamente ed erroneamente come sinonimo di bit rate. Questo è dovuto al fatto che nei vecchi modem e nei dispositivi digitali più semplici le due grandezze coincidono, in quanto ogni simbolo trasmesso è codificato su un singolo bit.
+Nei dispositivi moderni o più sofisticati un simbolo può invece essere rappresentato da una serie di più bit.
+Per questo motivo il symbol rate risulta spesso proporzionalmente più basso del bit rate.
+
+
+=== Velocità di propagazione ===
+La velocità di trasmissione non dipende dalla velocità o ritardo di propagazione del segnale sulla linea, bensì indica solamente quanta informazione è immessa o trasferita in linea, ovvero quanta informazione la linea è disposta ad accettare o sta accettando in ingresso per poi successivamente propagarla su di essa. Infatti, una volta che il segnale si è propagato sulla linea con la velocità di propagazione offerta dal mezzo trasmissivo, cioè dopo che è trascorso il ritardo di propagazione dipendente dalla distanza tra emettitore e ricevitore, il flusso dati della comunicazione in arrivo al ricevitore sarà continuo nel tempo e quindi il ricevitore percepirà un traffico dati pari alla suddetta velocità di immissione in input.
+Con un'analogia idrodinamica si può dire dunque che la velocità di trasmissione della linea rappresenta la 'portata' (in questo caso informativa), mentre la velocità di propagazione della linea, cioè del mezzo trasmissivo, rappresenta la velocità del fluido nel tubo.
+Il paragone ha però un limite oggettivo in quanto se è vero che in idrodinamica la portata, che è additiva, si conserva sempre per bilancio di massa, dato che la velocità del fluido può variare in rapporto alla sezione (mantenendo appunto costante la portata), in telecomunicazioni la portata informativa, pur essendo anch'essa additiva, non si conserva nel caso in cui si passi attraverso una linea con una banda passante minore (equivalente alla sezione del tubo in idrodinamica).
+Tale linea funge quindi da classico collo di bottiglia sulla portata stessa dell'intera comunicazione end to end. In tal caso, se la trasmissione in input non è adattata a quella massima trasportabile dalla linea a velocità di trasmissione minore, il sistema di telecomunicazioni opera con perdita di informazione. In sostanza dunque mentre in idrodinamica la portata è indipendente dalle caratteristiche del tubo e dipende unicamente da quanto fluido è immesso nell'estremità iniziale del tubo, in telecomunicazioni la portata informativa dipende dalle caratteristiche o risorse della linea in termini di ampiezza di banda e rapporto segnale/rumore, come espresso dal Teorema di Shannon.
+
+
+=== Larghezza di banda ===
+
+La larghezza di banda è la misura dell'ampiezza di banda dello spettro.
+La sua importanza in telecomunicazioni è legata al fatto che essa è a sua volta strettamente legata alla velocità di trasmissione dei dati: la quantità di informazione trasmissibile sul canale è infatti strettamente collegata all'intervallo di frequenze utilizzato nella trasmissione in base al teorema del campionamento di Nyquist-Shannon.
+Il legame tra la velocità di trasmissione e larghezza di banda discende direttamente dalla Condizione di Nyquist:
+
+dove 
+  
+    
+      
+        B
+      
+    
+    {\displaystyle B}
+   è la larghezza di banda del canale e 
+  
+    
+      
+        M
+      
+    
+    {\displaystyle M}
+   il numero di distinti valori che può assumere ogni simbolo trasmesso.
+
+
+== Note ==
+
+
+== Bibliografia ==
+ Dennis P. Curtin, Kim Foley, Kunal Sen, Cathleen Morin, Agostino Marengo e Alessandro Pagano, Informatica di base, traduzione di Alessandra Adami, 7ª ed., Milano, McGraw-Hill, 2021  [1999], ISBN 9788838698767.
+
+
+== Voci correlate ==
+Banda larga
+Capacità di canale
+Larghezza di banda
+Teorema di Nyquist
+Teorema di Shannon
+Throughput
+
+
+== Collegamenti esterni ==
+
+(EN) Eric W. Weisstein, Velocità di trasmissione, su MathWorld, Wolfram Research. 
+(EN) bit rate, in Free On-line Dictionary of Computing, Denis Howe. Disponibile con licenza GFDL
+		</div>
+		<div class="page_summary" style="margin-top: 3vh;">
+			In informatica e telecomunicazioni, la velocità di trasmissione (o di trasferimento, detta anche frequenza di cifra o bit-rate) è la grandezza indicante la quantità di informazione trasferita attraverso un canale di comunicazione in un dato intervallo di tempo.
+L'unità di misura associata è il bit per secondo.
+
+
+		</div>
+	</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html class="client" lang="it">
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			Transmission Control Protocol
+		</title>
+	</head>
+	<body>
+		<div class="page_content">
+			Лабораторная 2
+			<hr/>
+			In telecomunicazioni e informatica il Transmission Control Protocol (TCP) è un protocollo di rete a pacchetto di livello di trasporto, appartenente alla suite di protocolli Internet, che si occupa di controllo della trasmissione ovvero rendere affidabile la comunicazione dati in rete tra mittente e destinatario. Definito nella RFC 9293, su di esso si appoggia gran parte delle applicazioni della rete Internet, è presente solo sui terminali di rete (host) e non sui nodi interni di commutazione della rete di trasporto,  implementato come strato software di rete all'interno del sistema operativo di un host, e il terminale in trasmissione o in ricezione vi accede attraverso l'uso di opportune chiamate di sistema definite nelle API di sistema.
+
+
+== Descrizione ==
+Il TCP può essere classificato al livello trasporto (level 4) del modello di riferimento OSI, e di solito è usato in combinazione con il protocollo di livello rete (OSI level 3) IP.
+Nel modello TCP/IP il protocollo TCP occupa il livello 2, trasporto.
+In linea con i dettami del livello di trasporto stabiliti dal modello ISO/OSI e con l'intento di superare il problema della mancanza di affidabilità e controllo della comunicazione sorto con l'interconnessione su vasta scala di reti locali in un'unica grande rete geografica, TCP è stato progettato e realizzato per utilizzare i servizi offerti dai protocolli di rete di livello inferiore (IP e protocolli di livello fisico e livello datalink) che definiscono efficacemente il modo di trasferimento sul canale di comunicazione, ma che non offrono alcuna garanzia di affidabilità sulla consegna in termini di ritardo, perdita ed errore dei pacchetti informativi trasmessi, sul controllo di flusso tra terminali e sul controllo della congestione di rete, supplendo quindi ai problemi di cui sopra e costruendo così un affidabile canale di comunicazione tra due processi applicativi di rete. Il canale di comunicazione così costruito è composto da un flusso bidirezionale di byte a seguito dell'instaurazione di una connessione agli estremi tra i due terminali in comunicazione. Inoltre alcune funzionalità di TCP sono vitali per il buon funzionamento complessivo di una rete IP. Sotto questo punto di vista TCP può essere considerato come un protocollo di rete che si occupa di costruire connessioni e garantire affidabilità su una rete IP sottostante che è sostanzialmente di tipo best-effort.
+Il TCP nacque nel 1970 come frutto del lavoro di un gruppo di ricerca del Dipartimento della Difesa statunitense. I suoi punti di forza sono l'alta affidabilità e robustezza. La sua popolarità si deve anche ad una sua implementazione diffusa dalla Università di Berkeley, rilasciata in California sotto forma di sorgenti (TCP Berkeley). Molte tuttavia sono le implementazioni e sviluppi che si sono succeduti nel tempo come evoluzioni e miglioramenti (es. TCP Tahoe, TCP Reno, TCP New Reno).
+
+
+=== Caratteristiche principali ===
+TCP è un protocollo orientato alla connessione, ovvero prima di poter trasmettere dati deve stabilire la comunicazione, negoziando una connessione tra mittente e destinatario, che rimane attiva anche in assenza di scambio di dati e viene esplicitamente chiusa quando non più necessaria. Esso quindi possiede le funzionalità per creare, mantenere e chiudere una connessione.
+TCP è un protocollo affidabile: garantisce la consegna dei segmenti a destinazione attraverso il meccanismo degli acknowledgements.
+Il servizio offerto da TCP è il trasporto di un flusso di byte bidirezionale tra due applicazioni in esecuzione su host differenti. Il protocollo permette alle due applicazioni di trasmettere contemporaneamente nelle due direzioni, quindi il servizio può essere considerato "Full-duplex" anche se non tutti i protocolli applicativi basati su TCP utilizzano questa possibilità.
+Il flusso di byte prodotto dall'applicazione (o applicativo, o protocollo applicativo) sull'host mittente, viene preso in carico da TCP per la trasmissione, viene quindi frazionato in blocchi, detti segmenti, e consegnato al TCP sull'host destinatario che lo passerà all'applicativo indicato dal numero di porta del destinatario nell'header del segmento (es.: applicativo HTTP, porta 80).
+TCP garantisce che i dati trasmessi, se giungono a destinazione, lo facciano in ordine e una volta sola ("at most once"). Più formalmente, il protocollo fornisce ai livelli superiori un servizio equivalente ad una connessione fisica diretta che trasporta un flusso di byte. Questo è realizzato attraverso vari meccanismi di acknowledgment e di ritrasmissione su timeout.
+TCP offre funzionalità di controllo di errore sui pacchetti pervenuti grazie al campo checksum contenuto nella sua PDU.
+TCP possiede funzionalità di controllo di flusso tra terminali in comunicazione e controllo della congestione sulla connessione, attraverso il meccanismo della finestra scorrevole. Questo permette di ottimizzare l'utilizzo dei buffer di ricezione/invio sui due end devices (controllo di flusso) e di diminuire il numero di segmenti inviati in caso di congestione della rete.
+TCP fornisce un servizio di multiplazione delle connessioni su un host, attraverso il meccanismo dei numeri di porta del mittente.
+
+
+=== Confronto con UDP ===
+Le principali differenze tra TCP e UDP (User Datagram Protocol), l'altro principale protocollo di trasporto della suite di protocolli Internet, sono: 
+
+TCP è un protocollo orientato alla connessione. Pertanto, per stabilire, mantenere e chiudere una connessione, è necessario inviare segmenti di servizio i quali aumentano l'overhead di comunicazione. Al contrario, UDP è senza connessione ed invia solo i datagrammi richiesti dal livello applicativo; (nota: i pacchetti prendono nomi diversi a seconda delle circostanze a cui si riferiscono: segmenti (TCP) o datagrammi (UDP));
+UDP non offre nessuna garanzia sull'affidabilità della comunicazione, ovvero sull'effettivo arrivo dei segmenti, né sul loro ordine in sequenza in arrivo; al contrario il TCP, tramite i meccanismi di acknowledgement e di ritrasmissione su timeout, riesce a garantire la consegna dei dati, anche se al costo di un maggiore overhead (raffrontabile visivamente confrontando la dimensione delle intestazioni dei due protocolli); TCP riesce altresì a riordinare i segmenti in arrivo presso il destinatario attraverso un campo del suo header: il sequence number;
+l'oggetto della comunicazione di TCP è un flusso di byte, mentre quello di UDP sono singoli datagrammi.L'utilizzo del protocollo TCP rispetto a UDP è, in generale, preferito quando è necessario avere garanzie sulla consegna dei dati o sull'ordine di arrivo dei vari segmenti (come per esempio nel caso di trasferimenti di file).
+Al contrario UDP viene principalmente usato quando l'interazione tra i due host è idempotente o nel caso si abbiano forti vincoli sulla velocità e l'economia di risorse della rete (es. streaming in tempo reale, videogiochi multiplayer).
+
+
+=== Segmento TCP ===
+La PDU di TCP è detta segmento. Ciascun segmento viene normalmente imbustato in un pacchetto IP, ed è costituito dall'intestazione (header) TCP e da un carico utile (in inglese payload), ovvero i dati provenienti dal livello applicativo (es.: HTTP). I dati contenuti nell'intestazione costituiscono un canale di comunicazione tra TCP mittente e TCP destinatario, che viene utilizzato per realizzare le funzionalità dello strato di trasporto e non è accessibile agli strati dei livelli superiori.
+Un segmento TCP è così strutturato:
+
+Source port [16 bit] - Identifica il numero di porta sull'host mittente associato alla connessione TCP.
+Destination port [16 bit] - Identifica il numero di porta sull'host destinatario associato alla connessione TCP.
+Sequence number [32 bit] - Numero di sequenza, indica lo scostamento (espresso in byte) dell'inizio del segmento TCP all'interno del flusso completo, a partire dall'Initial Sequence Number (ISN), deciso all'apertura della connessione (Un campo a 32 bit utilizzato per il riassemblaggio dei dati).
+Acknowledgment number [32 bit] - Numero di riscontro, ha significato solo se il flag ACK è impostato a 1, e conferma la ricezione di una parte del flusso di dati nella direzione opposta, indicando il valore del prossimo Sequence number che l'host mittente del segmento TCP si aspetta di ricevere.
+Data offset [4 bit] - Indica la lunghezza (in dword da 32 bit) dell'header del segmento TCP; tale lunghezza può variare da 5 dword (20 byte) a 15 dword (60 byte) a seconda della presenza e della lunghezza del campo facoltativo Options.
+Reserved [4 bit] - Bit non utilizzati e predisposti per sviluppi futuri del protocollo; dovrebbero essere impostati a zero.
+Flags [8 bit] - Bit utilizzati per il controllo del protocollo:
+CWR (Congestion Window Reduced) - se impostato a 1 indica che l'host sorgente ha ricevuto un segmento TCP con il flag ECE impostato a 1 (aggiunto all'header in RFC 3168).
+ECE [ECN (Explicit Congestion Notification) -Echo] - se impostato a 1 indica che l'host supporta ECN durante il 3-way handshake (aggiunto all'header in RFC 3168).
+URG - se impostato a 1 indica che nel flusso sono presenti dati urgenti alla posizione (offset) indicata dal campo Urgent pointer. Urgent Pointer punta alla fine dei dati urgenti;
+ACK - se impostato a 1 indica che il campo Acknowledgment number è valido;
+PSH - se impostato a 1 indica che i dati in arrivo non devono essere bufferizzati ma passati subito ai livelli superiori dell'applicazione;
+RST - se impostato a 1 indica che la connessione non è valida; viene utilizzato in caso di grave errore; a volte utilizzato insieme al flag ACK per la chiusura di una connessione.
+SYN - se impostato a 1 indica che l'host mittente del segmento vuole aprire una connessione TCP con l'host destinatario e specifica nel campo Sequence number il valore dell'Initial Sequence Number (ISN); ha lo scopo di sincronizzare i numeri di sequenza dei due host. L'host che ha inviato il SYN deve attendere dall'host remoto un pacchetto SYN/ACK.
+FIN - se impostato a 1 indica che l'host mittente del segmento vuole chiudere la connessione TCP aperta con l'host destinatario. Il mittente attende la conferma dal ricevente (con un FIN-ACK). A questo punto la connessione è ritenuta chiusa per metà: l'host che ha inviato FIN non potrà più inviare dati, mentre l'altro host ha il canale di comunicazione ancora disponibile. Quando anche l'altro host invierà il pacchetto con FIN impostato, la connessione, dopo il relativo FIN-ACK, sarà considerata completamente chiusa.
+Window size [16 bit] - Indica la dimensione della finestra di ricezione dell'host mittente, cioè il numero di byte che il mittente è in grado di accettare a partire da quello specificato dall'acknowledgment number.
+Checksum [16 bit] - Campo di controllo utilizzato per la verifica della validità del segmento. È ottenuto facendo il complemento a 1 della somma complemento a uno a 16 bit dell'intero header TCP (con il campo checksum messo a zero), dell'intero payload, con l'aggiunta di uno pseudo header composto da: indirizzo IP sorgente (32bit),indirizzo IP destinazione (32bit), un byte di zeri, un byte che indica il protocollo e due byte che indicano la lunghezza del pacchetto TCP (header + dati).
+Urgent pointer [16 bit] - Puntatore a dato urgente, ha significato solo se il flag URG è impostato a 1 ed indica lo scostamento in byte a partire dal Sequence number del byte di dati urgenti all'interno del flusso.
+Options - Opzioni (facoltative) per usi del protocollo avanzati.
+Data - rappresenta il carico utile o payload da trasmettere cioè la PDU proveniente dal livello superiore.
+
+
+== Connessione ==
+Prima ancora del trasferimento dei dati su canale di comunicazione e delle operazioni di controllo di trasmissione sul flusso dei dati in ricezione, in trasmissione TCP si occupa di instaurare la connessione agli estremi tra i processi applicativi dei terminali in comunicazione attraverso la definizione del socket ovvero coppia indirizzo IP, porta sia del mittente che del destinatario. Si ricorda invece che la commutazione interna nei nodi della rete di trasporto dati segue invece tipicamente la commutazione di pacchetto ovvero senza circuito o connessione fissa dedicata tipica invece della commutazione di circuito. Il fine della connessione TCP è in ogni caso il riservamento di risorse tra processi applicativi che si scambiano informazioni o servizi tra loro (es. server e client). Al termine della connessione, TCP attua la fase dell'abbattimento della connessione. Le due procedure sono distinte e descritte a seguito. L'implementazione di applicazioni di connessione di rete a pacchetto ricade nell'ambito della cosiddetta programmazione socket.
+
+
+=== Apertura di una connessione - Three-way handshake ===
+La procedura utilizzata per instaurare in modo affidabile una connessione TCP tra due host è chiamata three-way handshake (stretta di mano in 3 passaggi), indicando la necessità di scambiare 3 messaggi tra host mittente e host ricevente affinché la connessione sia instaurata correttamente.
+Consideriamo ad esempio che l'host A intenda aprire una connessione TCP con l'host B; i passi da seguire quindi sono:
+
+A invia un segmento SYN a B - il flag SYN è impostato a 1 e il campo Sequence number contiene il valore x che specifica l'Initial Sequence Number di A;
+B invia un segmento SYN/ACK ad A - i flag SYN e ACK sono impostati a 1, il campo Sequence number contiene il valore y che specifica l'Initial Sequence Number di B e il campo Acknowledgment number contiene il valore x+1 confermando la ricezione del ISN di A;
+A invia un segmento ACK a B - il flag ACK è impostato a 1 e il campo Acknowledgment number contiene il valore y+1 confermando la ricezione del ISN di B.Il terzo segmento non sarebbe, idealmente, necessario per l'apertura della connessione in quanto già dopo la ricezione da parte di A del secondo segmento, entrambi gli host hanno espresso la loro disponibilità all'apertura della connessione. Tuttavia esso risulta necessario al fine di permettere anche all'host B una stima del timeout iniziale, come tempo intercorso tra l'invio di un segmento e la ricezione del corrispondente ACK.
+Il flag SYN risulta utile nell'implementazione pratica del protocollo, e nella sua analisi da parte dei firewall: nel traffico TCP i segmenti SYN stabiliscono nuove connessioni, mentre quelli con il flag non attivo appartengono a connessioni già instaurate.
+I segmenti utilizzati durante l'handshake sono solitamente 'solo header', ossia hanno il campo Data vuoto essendo questa una fase di sincronizzazione tra i due host e non di scambio di dati.
+Il three-way handshake si rende necessario poiché la sequenza numerica (ISN) non è legata ad un clock generale della rete, inoltre ogni pacchetto IP può avere il proprio modo di calcolare l'Initial Sequence Number. Alla ricezione del primo SYN non è possibile sapere se la sequenza ricevuta appartenga ad un ritardo dovuto ad una precedente connessione. Tuttavia, viene memorizzata l'ultima sequenza usata nella connessione, potendo così essere richiesta la verifica all'host mittente del SYN appartenente alla vecchia connessione.
+
+
+=== Chiusura di una connessione - doppio two-way handshake ===
+Dopo che è stata stabilita, una connessione TCP non è considerata una singola connessione bidirezionale, ma piuttosto come l'interazione di due connessioni monodirezionali; pertanto, ognuna delle parti dovrebbe terminare la propria connessione. Possono esistere anche connessioni chiuse a metà, in cui solo uno dei due host ha chiuso la connessione poiché non ha più nulla da trasmettere, ma può (e deve) ancora ricevere i dati dall'altro host.
+La chiusura della connessione si può effettuare in due modi: con un handshake a tre vie, in cui le due parti chiudono contemporaneamente le rispettive connessioni, o con uno a quattro vie (o meglio 2 separati handshake), in cui le due connessioni vengono chiuse in tempi diversi.
+L'handshake a 3 vie per la chiusura della connessione è omologo a quello usato per l'apertura della connessione, con la differenza che il flag utilizzato è il FIN invece del SYN. Un host invia un segmento con la richiesta FIN, l'altro risponde con un FIN + ACK, infine il primo manda l'ultimo ACK, e l'intera connessione viene terminata.
+Il doppio handshake a 2 vie invece viene utilizzato quando la disconnessione non è contemporanea tra i due host in comunicazione. In questo caso uno dei due host invia la richiesta di FIN, e attende l'ACK di risposta; l'altro terminale farà poi altrettanto, generando quindi un totale di 4 segmenti.
+È possibile anche una modalità più aggressiva di chiusura della connessione, settando il flag di RESET nel segmento interrompendo la connessione in entrambe le direzioni. Il TCP che riceve un RESET chiude la connessione interrompendo ogni invio di dati.
+
+
+=== Multiplazione e porte ===
+Ciascuna connessione TCP attiva è associata a un socket aperto da un processo (il socket è lo strumento offerto dal sistema operativo alle applicazioni per usare le funzionalità della rete). TCP si occupa di smistare i dati tra le connessioni attive ed i relativi processi. Per questo, a ciascuna connessione tra due host viene associato un numero di porta su ciascuno dei due host, che è un intero senza segno a 16 bit (0-65535), contenuto nell'apposito campo dell'header.
+Una connessione TCP sarà quindi identificata dagli indirizzi IP dei due host e dalle porte utilizzate sui due host.
+In questo modo, un server può accettare connessioni da più client contemporaneamente attraverso una o più porte, un client può stabilire più connessioni verso più destinazioni, ed è anche possibile che un client stabilisca contemporaneamente più connessioni indipendenti verso la stessa porta dello stesso server.
+
+
+=== Server e Client ===
+I due processi che comunicano attraverso una connessione TCP hanno ruoli diversi:
+
+Il processo che avvia una nuova connessione TCP è detto client, ed invia una richiesta di connessione verso una determinata porta.
+Affinché la connessione venga stabilita, su quella porta deve esserci un processo server "in ascolto", che accetta di stabilire una connessione TCP.Le porte conosciute e registrate sono quindi utilizzate dai processi server, e sono convenzionalmente associate a particolari servizi, in modo che un client sappia a quale porta connettersi per raggiungere un determinato server.
+Il processo server, che è in ascolto su una certa porta, rimane bloccato in attesa che un client si colleghi. Il processo client richiede di stabilire una connessione verso un determinato server su una determinata porta. Normalmente la porta sorgente usata dal client viene allocata dinamicamente dal sistema operativo del client. Quando il TCP stabilisce la connessione, a entrambi i processi viene assegnato un socket tramite cui essi possono comunicare tra loro. Tipicamente il processo server effettua una fork, affida al figlio il compito di comunicare con il nuovo client e si rimette in ascolto. Da questo punto in poi, client e server hanno ruoli simmetrici, e utilizzano gli stessi strumenti per comunicare attraverso il socket.
+
+
+== Affidabilità della comunicazione ==
+
+
+=== Consegna ordinata ed eliminazione di duplicati ===
+Il Sequence number (o numero di sequenza) serve a identificare e posizionare in maniera ordinata il carico utile del segmento TCP all'interno del flusso di dati. Con la trasmissione tipica a commutazione di pacchetto della rete dati infatti ciascun pacchetto può seguire percorsi diversi in rete e giungere fuori sequenza in ricezione.
+In ricezione TCP si aspetta di ricevere il segmento successivo all'ultimo segmento ricevuto in ordine, ovvero, quello il cui numero di sequenza è pari al numero di sequenza dell'ultimo pervenuto in ordine, più la dimensione del carico utile del segmento in attesa (cioè del suo campo Data).
+In relazione al numero di sequenza TCP il ricevente attua le seguenti procedure:
+
+se il numero di sequenza ricevuto è quello atteso invia direttamente il carico utile del segmento al processo di livello applicativo e libera i propri buffer.
+se il numero di sequenza ricevuto è maggiore di quello atteso deduce che uno o più segmenti ad esso precedenti sono andati persi, ritardati dal livello di rete sottostante o ancora in transito sulla rete. Pertanto, memorizza temporaneamente in un buffer il carico utile del segmento ricevuto fuori sequenza per poterlo consegnare al processo applicativo solo dopo aver ricevuto e consegnato anche tutti i segmenti precedenti non ancora pervenuti passanti anch'essi per il buffer, aspettandone l'arrivo fino ad un tempo limite prefissato (time-out). All'istante di consegna del blocco ordinato di segmenti tutto il contenuto del buffer viene liberato. Dal punto di vista del processo applicativo, quindi, i dati arriveranno in ordine anche se la rete ha per qualsiasi motivo alterato questo ordine realizzando così il requisito della consegna ordinata dei dati.
+se il numero di sequenza ricevuto è inferiore a quello atteso, il segmento viene considerato un duplicato di uno già ricevuto e già inviato allo strato applicativo e dunque scartato. Questo permette di realizzare l'eliminazione dei duplicati di rete.
+
+
+=== Riscontro dei pacchetti e ritrasmissione ===
+Per ogni segmento ricevuto in sequenza inoltre TCP lato ricevente invia un Acknowledgment Number o numero di riscontro dell'avvenuta ricezione. Il numero di riscontro presente in un segmento riguarda il flusso di dati nella direzione opposta. In particolare, il numero di riscontro inviato da A (Ricevente) a B è pari al numero di sequenza atteso da A e, quindi, riguarda il flusso di dati da B ad A, una sorta di report su ciò che è stato ricevuto.
+In particolare il protocollo TCP adotta la politica di Conferma cumulativa, ovvero l'arrivo di numero di riscontro indica al TCP trasmittente che il ricevente ha ricevuto e correttamente inoltrato al proprio processo applicativo il segmento avente numero di sequenza pari al numero di riscontro indicato (-1) ed anche tutti i segmenti ad esso precedenti. Per tale motivo TCP lato trasmittente mantiene temporaneamente in un buffer una copia di tutti i dati inviati, ma non ancora riscontrati: quando questi riceve un numero di riscontro per un certo segmento, deduce che tutti i segmenti precedenti a quel numero sono stati ricevuti correttamente liberando il proprio buffer dai dati. La dimensione massima dei pacchetti riscontrabili in maniera cumulativa è specificata dalle dimensioni della cosiddetta finestra scorrevole.
+Per evitare tempi di attesa troppo lunghi o troppo corti per ciascun segmento inviato TCP lato trasmittente avvia un timer, detto timer di ritrasmissione RTO (Retransmission Time Out): se questi non riceve un ACK di riscontro per il segmento inviato prima che il timer scada, TCP assume che tutti i segmenti trasmessi a partire da questo siano andati persi e quindi procede alla ritrasmissione.
+Si noti che, in TCP, il meccanismo dei numeri di riscontro non permette al ricevitore di comunicare al trasmettitore che un segmento è stato perso, ma alcuni dei successivi sono stati ricevuti (meccanismo ad Acknowledgment Number negativi), quindi è possibile che per un solo pacchetto perso ne debbano essere ritrasmessi molti. Questo comportamento non ottimale è compensato dalla semplicità del protocollo.
+Questa tecnica è detta Go-Back-N (vai indietro di N segmenti); l'alternativa, ovvero progettare il protocollo in modo tale che solo i pacchetti effettivamente persi vengano ritrasmessi, è detta Selective Repeat (ripetizione selettiva); l'utilizzo però di alcuni campi  permette l'utilizzo della ripetizione selettiva.
+I numeri di riscontro e i relativi timer di ritrasmissione permettono quindi di realizzare la consegna affidabile, ovvero di garantire che tutti i dati inviati siano comunque consegnati nel caso in cui qualche pacchetto possa essere perso nel transito attraverso la rete (controllo di errore in termini di riscontro di trasmissione).
+
+
+=== Controllo di flusso ===
+L'affidabilità della comunicazione in TCP è garantita anche dal cosiddetto controllo di flusso ovvero far in modo che il flusso di dati in trasmissione non superi le capacità di ricezione ovvero di memorizzazione del ricevente con perdita di pacchetti e maggior peso e latenze nelle successive richieste di ritrasmissione. Viene attuato attraverso la specifica da parte del destinatario di un opportuno campo noto come RCV_WND (finestra di ricezione), variabile dinamica (ossia dipendente dallo spazio disponibile) che specifica il numero massimo di segmenti ricevibili dal destinatario. Definito:
+LastByteRead: numero dell'ultimo byte nel flusso di dati che il processo applicativo in B ha letto dal buffer
+LastByteRcvd: numero dell'ultimo byte nel flusso di dati proveniente dalla rete che è stato copiato nel buffer di ricezione RcvBuffer precedentemente allocatoallora necessariamente, dovendo TCP evitare l'overflow del proprio buffer, si avrà:
+RCV_WND = RcvBuffer - [LastByteRcvd - LastByteRead]
+dove ovviamente per negare l'overflow:
+RcvBuffer ≥ [LastByteRcvd - LastByteRead]
+A sua volta il mittente terrà traccia dell'ultimo byte mandato e dell'ultimo byte per cui si è ricevuto l'ACK affinché esso non mandi in overflow il buffer del destinatario.
+Si noti come, qualora la finestra di ricezione fosse vuota (RCV_WND == 0), il mittente continuerà ad inviare segmenti di un byte, in modo tale da garantire la sincronizzazione tra mittente e destinatario..
+
+
+=== Problemi nel controllo di flusso in TCP ===
+Esistono alcuni problemi nel controllo di flusso in TCP che si verificano sia lato trasmettitore che lato ricevitore. Tali problemi vanno sotto il nome di Silly window syndrome ed hanno effetti e cause diverse a seconda del lato.
+Silly window lato ricevitore: se il ricevitore svuota molto lentamente il buffer di ricezione, solo quando il ricevitore estrae informazioni dal buffer di ricezione si libera un piccolo spazio (Receive Window molto piccola) e tale valore di Receive Window viene comunicato indietro al trasmettitore. il problema è che ora, il trasmettitore usa una finestra di trasmissione molto stretta e quindi può succedere che esso sia costretto ad inviare dei segmenti molto corti rispetto all'header canonico di 20 byte, con conseguente abbassamento dell'efficienza della trasmissione.
+Per mitigare questo problema il TCP fa in modo che il ricevitore "menta" al trasmettitore indicando una finestra nulla sino a che il suo buffer di ricezione non si è svuotato per metà o per una porzione almeno pari al Maximum Segment Size (MSS), evitando così che il trasmettitore invii segmenti molto corti che limitino l'efficienza della trasmissione.
+Tale algoritmo risolutivo viene chiamato algoritmo di Clark.
+Silly window lato trasmettitore: si verifica quando l'applicazione genera dati molto lentamente. Dal momento che il TCP legge i dati che sono presenti nel buffer di trasmissione creando dei segmenti che invia dall'altra parte, nel caso in cui l'applicazione generi i dati molto lentamente l'entità TCP potrebbe essere forzata a creare segmenti molto corti (e con tanto overhead).
+La soluzione si chiama algoritmo di Nagle, per cui il TCP sorgente invia la prima porzione di dati anche se corta, e quando è il momento di creare nuovi segmenti, tali segmenti, vengono creati solamente se il buffer d'uscita contiene dati sufficienti per riempire un MSS oppure anche quando riceve un riscontro valido.
+
+
+=== Controllo di congestione ===
+
+Infine l'ultimo tipo di controllo effettuato da TCP per garantire affidabilità alla comunicazione è il cosiddetto controllo della congestione ovvero far in modo che si limitino il più possibile fenomeni di congestione all'interno della rete per eccessivo traffico sui dispositivi di rete con perdita di pacchetti in transito e maggior peso e latenze nelle successive richieste di ritrasmissione, modulando nel tempo la quantità di dati in trasmissione in funzione dello stato interno di congestione. La particolarità di tale controllo è che viene effettuato agendo sulla trasmissione agli estremi cioè sui terminali di rete e non attraverso la commutazione interna alla rete grazie alle informazioni deducibili dal terminale stesso sullo stato della trasmissione dei pacchetti. Nello specifico, una volta "stimato" lo stato di congestione interno della rete avendo scelto come parametro di riferimento la perdita di pacchetti trasmessi desunta dai mancati ACK di riscontro dei pacchetti stessi, tale controllo viene poi attuato attraverso la definizione da parte del mittente di un opportuno campo noto come C_WND (finestra di congestione) la quale assegna, dinamicamente nel tempo, il numero massimo di segmenti da trasmettere al destinatario.
+
+
+== I timer del TCP ==
+
+
+=== Timer di ritrasmissione (RTO->Retrasmission Time Out) ===
+Come descritto sopra, il timer di ritrasmissione serve a verificare che ciascun segmento trasmesso venga riscontrato.
+La corretta impostazione di questo timer è difficile ma molto importante, in quanto un timer troppo breve comporta ritrasmissioni inutili (il timer scatta mentre il riscontro o il pacchetto sono ancora in viaggio), mentre un timer troppo lungo comporta attese in caso di effettiva perdita di pacchetti. Ovviamente tale intervallo dovrà essere almeno pari al Round Trip Time cioè al tempo di percorrenza a due vie di un pacchetto per tornare al mittente sotto forma di ACK. Tale RTT, per la natura intrinseca della commutazione di pacchetto interna alla rete, è tipicamente variabile in maniera aleatoria. TCP allora aggiusta continuamente il timer di ritrasmissione basandosi su una stima a media mobile del Round Trip Time.
+
+
+=== Timer di persistenza ===
+Come spiegato sopra, il TCP utilizza il metodo della finestra scorrevole per gestire il controllo di flusso di dati che il ricevente è in grado di accettare dal mittente. Tra i valori validi di questo campo vi è anche lo zero, a significare che il ricevente richiede l'interruzione momentanea dell'invio di dati.
+Nel malaugurato caso in cui il pacchetto che riapre la finestra venga perso, il mittente del canale TCP rimarrà però in attesa indefinita. Per evitare questo, il TCP avvia un timer, detto timer di persistenza, ogni qual volta il ricevente chiude la finestra. Quando questo timer scade, il mittente invia un pacchetto sonda al ricevente, provocandone una risposta: in questo modo il mittente potrà essere sicuro che la finestra sia chiusa (ricevendo un altro pacchetto con campo Window a 0) o sbloccarsi dallo stallo (ricevendo un pacchetto con campo Window diverso da zero).
+
+
+=== Timer di keepalive ===
+La RFC 793 che definisce il protocollo TCP non prevede particolari azioni da intraprendere quando non ci sono dati da trasmettere sulla connessione. Alcune implementazioni però consentono di trasmettere periodicamente segmenti vuoti, detti keepalive, per evitare di mantenere indefinitamente in memoria connessioni con sistemi che potrebbero anche non essere più attivi. In molti sistemi il software applicativo ha la possibilità di scegliere se abilitare o meno i keepalive per ogni connessione.
+Quando si usano i keepalive, è presente dunque il timer di keepalive: esso viene reimpostato alla ricezione o alla trasmissione di ogni segmento, e quando scade viene trasmesso un keepalive. Un valore tipico è di due ore.
+
+
+=== Timed wait ===
+L'ultimo timer utilizzato da TCP è il timed wait. In pratica, prima di disconnettere effettivamente una connessione, i due estremi del canale attendono un tempo pari al doppio del tempo di vita di un comune pacchetto: questo evita che dei pacchetti possano rimanere circolanti per la rete anche dopo la chiusura.
+
+
+== Vulnerabilità ==
+Il protocollo TCP viene progettato per la prima volta come strumento da utilizzare in reti chiuse e private, gestite da enti o università che quindi non si pongono il problema di garantirne la sicurezza; funzionalità come la sicurezza, l'integrità e l'autenticità della comunicazione tra due host vengono relegate a livelli di rete superiori. Esistono perciò diverse soluzioni implementative per ovviare a questa mancanza. I risultati di una valutazione completa sulla sicurezza di questo protocollo, insieme a possibili soluzioni, sono stati pubblicati nel 2009, e sono attualmente studiati da IETF. Di seguito vengono riportate e illustrate genericamente le principali e più diffuse metodologie per condurre un attacco a livello di trasporto su una comunicazione che si appoggia a questo protocollo.
+
+
+=== Denial of service ===
+
+Un attacco DoS ha come scopo quello di mandare in tilt un server occupando tutte le risorse a sua disposizione. Questo obiettivo può essere raggiunto attraverso diverse tecniche.
+Un primo modo consiste nell'utilizzare un metodo che prende il nome di SYN flood. Per aprire una connessione TCP, come già detto, è necessario il meccanismo del Three-Way Handshake. Se il client che ha chiesto di instaurare una connessione non risponde al server con il pacchetto di ACK dopo che ha ricevuto il relativo SYN-ACK, il server rimarrà in attesa. Utilizzando tecniche di IP spoofing e inviando ripetutamente pacchetti SYN appositamente assemblati e non il corrispettivo ACK, un singolo host può arrivare a consumare grandi quantità di risorse sul server che continuerà a tenere in memoria informazioni su connessioni fittizie. Possibili soluzioni a questo problema sono l'introduzione di timer al termine del quale il server cancellerà la connessione o l'introduzione di un meccanismo chiamato SYN cookies, anche se quest'ultimo porta con sé un proprio insieme di vulnerabilità. Un altro attacco che mira a consumare tutte le risorse di un sistema è l'utilizzo di software di tipo Sockstress, tale eventualità può facilmente essere scongiurata applicando politiche di gestione delle risorse del sistema.
+
+
+=== Connection hijacking ===
+Come detto precedentemente, ogni pacchetto TCP è identificato da un numero di sequenza che lo individua univocamente all'interno della comunicazione. Un utente malintenzionato che è in grado di intercettare una sessione TCP e di reindirizzare i pacchetti può disattivare una connessione TCP. Per farlo, l'attaccante apprende il successivo numero di sequenza della comunicazione in corso e crea un falso pacchetto che assomigli a quello successivo del flusso e lo invia al destinatario al posto dell'originale. Quando il destinatario riceve il pacchetto falso, lo accetta per via del numero di sequenza corretto, ma riscontrando una lunghezza del pacchetto diversa da quella prevista, perde la sincronizzazione con l'host sorgente e chiude quindi la connessione. Questo procedimento può essere combinato con tecniche di ARP spoofing o di modifica del protocollo di routing per gestire il controllo del flusso di pacchetti, in modo da ottenere un controllo permanente sulla connessione TCP.
+Attuare questo tipo di attacco non era difficile prima della RFC 1948, quando il numero di sequenza era facilmente prevedibile grazie a tecniche di IP Spoofing. Questo è il motivo per cui, ad oggi, il numero di sequenza iniziale viene scelto casualmente.
+
+
+=== TCP Veto ===
+Un utente malintenzionato che, oltre al numero di sequenza, è  in grado di predire anche la dimensione del pacchetto successivo può indurre il destinatario ad accettarne uno dannoso senza interrompere la connessione esistente. L'attaccante genera un pacchetto con il numero di sequenza e con una dimensione del payload del successivo segmento atteso, avendo però completa libertà sui dati da inserire all'interno. Una volta ricevuto questo pacchetto il destinatario lo accetta quindi senza problemi. Quando il pacchetto legittimo viene ricevuto, viene scartato dal destinatario poiché ne ha già ricevuto uno con quel numero di sequenza in quella connessione, come un normale pacchetto duplicato. Da ciò deriva il termine che descrive questo attacco: il pacchetto legittimo riceve il veto dal pacchetto dannoso. A differenza del Connection hijacking, la connessione non viene mai persa e la comunicazione continua normalmente dopo che il pacchetto dannoso viene accettato. TCP Veto dà all'attaccante un controllo minore sulla comunicazione, ma rende l'attacco particolarmente difficile da individuare. Il traffico che richiede il Connection hijacking per il controllo della connessione in questo caso non avviene, evitando di attirare attenzioni indesiderate. L'unica prova di un avvenuto TCP Veto è un singolo pacchetto duplicato, un evento normale in TCP. Il mittente del pacchetto legittimo invece non avrà alcuna percezione dell'avvenuto attacco.
+
+
+=== TCP Reset ===
+Nei pacchetti TCP è presente un flag nell'header, chiamato RST. In molti pacchetti questo bit è impostato a zero e non ha nessun effetto, se invece è impostato a uno, indica al destinatario che può interrompere immediatamente la connessione e quindi liberare tutte le risorse occupate, dato che il mittente non ha intenzione di inviare ulteriori pacchetti. Un utente malintenzionato può quindi ascoltare la conversazione tra due host, e inviare a uno o a entrambi un pacchetto con il flag RST impostato a uno. Questo metodo consente di interrompere connessioni TCP in modo veloce e senza lasciare particolari tracce. L'attaccante deve comunque camuffare il pacchetto modificando l'indirizzo IP di provenienza, per poter ingannare l'host.
+
+
+== Note ==
+
+
+== Voci correlate ==
+Internet Protocol
+Porta (reti)
+Finestra scorrevole
+User Datagram Protocol (UDP)
+Stream Control Transmission Protocol
+Controllo di errore
+Controllo di flusso
+Controllo della congestione in TCP
+TCP tuning
+TCP connect scan
+
+
+== Altri progetti ==
+
+ Wikimedia Commons contiene immagini o altri file sul Transmission Control Protocol
+
+
+== Collegamenti esterni ==
+
+ TCP, su Treccani.it – Enciclopedie on line, Istituto dell'Enciclopedia Italiana. 
+(EN) Transmission Control Protocol, in Free On-line Dictionary of Computing, Denis Howe. Disponibile con licenza GFDL
+(EN) RFC 793 - Transmission Control Protocol Specifications, su tools.ietf.org.
+ Traduzione in italiano dell'RFC (TXT), su rfc.altervista.org.
+(EN) Porte di comunicazione TCP (PDF), su answersthatwork.com.
+(EN) RFC 1948 - Defending Against Sequence Number Attacks, su tools.ietf.org.
+(EN) Security Assessment of the Transmission Control Protocol (TCP) (PDF), su cpni.gov.uk. URL consultato il 10 novembre 2017 (archiviato dall'url originale il 6 marzo 2009).
+		</div>
+		<div class="page_summary" style="margin-top: 3vh;">
+			In telecomunicazioni e informatica il Transmission Control Protocol (TCP) è un protocollo di rete a pacchetto di livello di trasporto, appartenente alla suite di protocolli Internet, che si occupa di controllo della trasmissione ovvero rendere affidabile la comunicazione dati in rete tra mittente e destinatario. Definito nella RFC 9293, su di esso si appoggia gran parte delle applicazioni della rete Internet, è presente solo sui terminali di rete (host) e non sui nodi interni di commutazione della rete di trasporto,  implementato come strato software di rete all'interno del sistema operativo di un host, e il terminale in trasmissione o in ricezione vi accede attraverso l'uso di opportune chiamate di sistema definite nelle API di sistema.
+
+
+		</div>
+	</body>
+</html>

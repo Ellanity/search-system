@@ -56,9 +56,9 @@ def create_html(page):
 
 #####
 LANGUAGE = "ru"
-found_page = search_page("Инкапсуляция (программирование)")
+found_page = search_page("Инжиниринг")
 create_html(found_page)
 
 LANGUAGE = "it"
-found_page = search_page("Incapsulamento (programmazione)")
+found_page = search_page("Engineering ingegneria informatica")
 create_html(found_page)

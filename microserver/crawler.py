@@ -50,6 +50,10 @@ class WebСrawler:
         # inits
         self.__init_system_variables__()
         self.__init_server_dictionary__()
+
+        # 
+        self.language_definer_ngrams = None
+        self.__init_language_definers__()
         
         # states
         self.possible_states = {
@@ -101,6 +105,11 @@ class WebСrawler:
             if not is_exist:
                 os.makedirs(path)
                 
+    def __init_language_definers__(self):
+        self.language_definer_ngrams = DefinerNGrammsMethod()
+        self.language_definer_ngrams.updateDefinerDocumentsProfiles()
+        self.language_definer_alphabet = DefinerAlphabetMethod()
+
     def __init_server_dictionary__(self):
         # files of dictionary parts (one part is one character in allowed_dictionary)
         paths = [
@@ -218,6 +227,8 @@ class WebСrawler:
     
     def __createSearchImageDocumentTemp(self, document_url):
         
+        print(document_url)
+
         # get raw text from file
         html_document_with_tags=""
         current_path: str = os.path.join(self.__working_directory, document_url)
@@ -251,9 +262,9 @@ class WebСrawler:
         language_defined_by_alphabet_method = ""
         language_defined_by_neural_network_method = ""
 
-        try: language_defined_by_ngramms_method = DefinerNGrammsMethod.define(html_document_without_tags)
+        try: language_defined_by_ngramms_method = self.language_definer_ngrams.define(html_document_without_tags)
         except: pass
-        try: language_defined_by_alphabet_method =DefinerAlphabetMethod.define(html_document_without_tags)
+        try: language_defined_by_alphabet_method = self.language_definer_alphabet.define(html_document_without_tags)
         except: pass
         try: language_defined_by_neural_network_method = DefinerNeuralNetworkMethod.define(html_document_without_tags)
         except: pass

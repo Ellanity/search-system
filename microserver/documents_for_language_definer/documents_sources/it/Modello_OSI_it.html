@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html class="client" lang="it">
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			Modello OSI
+		</title>
+	</head>
+	<body>
+		<div class="page_content">
+			Лабораторная 2
+			<hr/>
+			Il modello OSI (acronimo di Open Systems Interconnection, conosciuto anche come modello ISO/OSI), in telecomunicazioni e informatica, è uno standard stabilito nel 1984 dall'International Organization for Standardization (ISO), il principale ente di standardizzazione internazionale, il quale sentì la necessità di produrre una serie di norme tecniche per legge per reti di calcolatori avviando il progetto per la definizione di un modello di riferimento a formato aperto per l'interconnessione di sistemi di computer (Basic Reference Model o standard ISO 7498).
+Tale modello stabilisce per l'architettura logica di rete, ovvero per le funzioni di comunicazione delle telecomunicazioni o di sistemi informatici, una struttura a strati composta da una pila di protocolli di comunicazione di rete suddivisa in 7 livelli, i quali insieme eseguono tutte le funzionalità della rete, seguendo un modello logico-gerarchico. A livello implementativo lo standard de facto affermatosi per architetture di rete a livelli è invece il TCP/IP.
+
+
+== Caratteristiche ==
+
+Il modello ISO/OSI, concepito per reti di telecomunicazioni a commutazione di pacchetto, è costituito da una pila (o stack) di protocolli attraverso i quali viene ridotta la complessità implementativa di un sistema di comunicazione per il networking. In particolare ISO/OSI è costituito da strati (o livelli), i cosiddetti layer, che definiscono e racchiudono in sé a livello logico uno o più aspetti fra loro correlati della comunicazione fra due nodi di una rete. I layer sono in totale 7 e vanno dal livello fisico (quello del mezzo fisico, ossia del cavo, delle onde radio, fibra ottica o qualsiasi altro sistema trasmissivo) fino al livello delle applicazioni, attraverso cui si realizza la comunicazione di alto livello.Ogni layer individua un protocollo di comunicazione del livello medesimo. ISO/OSI realizza una comunicazione per livelli, cioè dati due nodi 
+  
+    
+      
+        A
+      
+    
+    {\displaystyle A}
+   e 
+  
+    
+      
+        B
+      
+    
+    {\displaystyle B}
+  , il livello 
+  
+    
+      
+        n
+      
+    
+    {\displaystyle n}
+   del nodo 
+  
+    
+      
+        A
+      
+    
+    {\displaystyle A}
+   può scambiare informazioni col livello 
+  
+    
+      
+        n
+      
+    
+    {\displaystyle n}
+   del nodo 
+  
+    
+      
+        B
+      
+    
+    {\displaystyle B}
+  , ma non con gli altri. Ogni livello in trasmissione realizza la comunicazione col livello corrispondente sui nodi di transito o destinatari usando il SAP (service access point) del livello immediatamente sottostante. Sicché ISO/OSI incapsula i messaggi di livello 
+  
+    
+      
+        n
+      
+    
+    {\displaystyle n}
+   in messaggi del livello 
+  
+    
+      
+        n
+        −
+        1
+      
+    
+    {\displaystyle n-1}
+  . Così se 
+  
+    
+      
+        A
+      
+    
+    {\displaystyle A}
+   deve inviare, ad esempio, una e-mail a 
+  
+    
+      
+        B
+      
+    
+    {\displaystyle B}
+  , l'applicazione (liv. 7) di 
+  
+    
+      
+        A
+      
+    
+    {\displaystyle A}
+   propagherà il messaggio usando il layer sottostante (liv. 6) che a sua volta userà il SAP del layer inferiore, fino ad arrivare alla comunicazione ovvero alla trasmissione sul canale o mezzo fisico trasmissivo.
+In tal modo si realizza una comunicazione multilivello che consente, ad esempio, di implementare algoritmi diversi per l'instradamento in rete pur disponendo di protocolli di trasporto connessi e scegliere ed adattare protocolli e relativi algoritmi alla particolare rete di telecomunicazioni da realizzare. Tutto ciò conferisce modularità al sistema con maggiore semplicità di progettazione e gestione della rete ovvero possibilità di migliorare, sviluppare e dunque eventualmente sostituire i protocolli dei vari strati cioè implementare e reimplementare con dei protocolli ciascuna delle rispettive funzionalità logiche lasciando inalterate le funzioni altrui.
+Al fine di ottenere un miglioramento dell'attuale modello può risultare interessante la possibilità di trarre vantaggio da uno scambio di informazioni nell'ambito della stessa pila protocollare, tra gli strati non adiacenti.
+Questa possibilità prende il nome di cross-layer (CL) ed è interessante soprattutto nelle comunicazioni radio per la natura stessa variabile del mezzo trasmissivo; sta riscuotendo un notevole interesse negli ultimi anni soprattutto per la riduzione dei consumi di energia nelle comunicazioni wireless. L'idea fondamentale del concetto cross-layer è di introdurre la capacità, nei vari protocolli di comunicazione, di scambiarsi informazioni per adattarsi agli specifici stati del collegamento della rete. A differenza del modello OSI classico, non si vogliono più prendere solo delle contromisure preventive o meccanismi di controllo successivi ad un determinato evento verificatosi nella rete, bensì si cerca di decidere in modo interattivo con essa sfruttando le informazioni comuni a tutti gli strati.
+
+
+=== Elenco e funzioni dei livelli ===
+
+
+==== Livello 1: fisico (Physical Layer) ====
+
+Obiettivo: trasmettere un flusso di dati non strutturati attraverso un collegamento fisico, occupandosi della forma e dei livelli di tensione del segnale. Ha a che fare con le procedure meccaniche ed elettroniche necessarie a stabilire, mantenere e disattivare un collegamento fisico.Semplicemente: si occupa di controllare la rete, gli hardware che la compongono e i dispositivi che permettono la connessione.
+In questo livello si decidono:
+
+il numero di bit in un collegamento (PROB);
+le tensioni scelte per rappresentare i valori logici dei bit trasmessi;
+la durata in microsecondi del segnale che identifica un bit;
+la modulazione e la codifica utilizzata;
+l'eventuale trasmissione simultanea in due direzioni (Half-Duplex o Full-Duplex);
+la forma e la meccanica dei connettori usati per collegare l'hardware al mezzo trasmissivo.A questo livello lavorano i modem e gli hub.
+
+
+==== Livello 2: collegamento dati (Datalink Layer) ====
+
+Obiettivo: permettere il trasferimento affidabile di dati attraverso il livello fisico. Invia frame di dati con la necessaria sincronizzazione ed effettua un controllo degli errori e delle perdite di segnale. Tutto ciò consente di far apparire, al livello superiore, il mezzo fisico come una linea di trasmissione esente da errori di trasmissione.Questo livello si occupa in primis di formare i dati da inviare attraverso il livello fisico, incapsulando il pacchetto proveniente dallo strato superiore in un nuovo pacchetto provvisto di un nuovo header (intestazione) e tail (coda), usati anche per sequenze di controllo. Questa frammentazione dei dati in specifici pacchetti è detta framing e i singoli pacchetti sono i frame (trame).
+Come controllo di errore, per ogni pacchetto ricevuto, il destinatario invia al mittente un pacchetto ACK (acknowledgement, conferma) contenente lo stato della trasmissione: il mittente deve ripetere l'invio dei pacchetti mal trasmessi e di quelli che non hanno ricevuto riscontro/risposta. Per ottimizzare l'invio degli ACK, si usa una tecnica detta Piggybacking, che consiste nell'accodare ai messaggi in uscita gli ACK relativi ad una connessione in entrata, per ottimizzare l'uso del livello fisico. I pacchetti ACK possono anche essere raggruppati e mandati in blocchi.
+Questo livello si occupa anche di controllare il flusso di dati (controllo di flusso): in caso di sbilanciamento della velocità di trasmissione tra mittente e destinatario, si occupa di rallentare l'operazione della macchina più veloce, accordandola all'altra e minimizzando così le perdite dovute a sovraccarico sul destinatario.
+La sua unità dati fondamentale è il frame.
+A questo livello lavorano gli switch e i bridge.
+
+
+==== Livello 3: rete (Network Layer) ====
+
+Obiettivo: rendere i livelli superiori indipendenti dai meccanismi e dalle tecnologie di trasmissione usate per la connessione e prendersi carico della consegna a destinazione dei pacchetti.È responsabile di:
+
+routing: scelta ottimale del percorso di rete da utilizzare per garantire la consegna delle informazioni dal mittente al destinatario, scelta svolta dal router attraverso dei particolari algoritmi di Routing e tabelle di routing;
+conversione dei dati nel passaggio fra una rete ed un'altra con diverse caratteristiche, come il protocollo di rete utilizzato (internet-working). Deve, quindi:
+tradurre gli indirizzi di rete;
+valutare la necessità di frammentare i pacchetti dati se la nuova rete ha una diversa Maximum Transmission Unit (MTU);
+valutare la necessità di gestire diversi protocolli attraverso l'impiego di gateway.La sua unità dati fondamentale è il datagram.
+A questo livello lavorano i router.
+
+
+==== Livello 4: trasporto (Transport Layer) ====
+
+Obiettivo: permettere un trasferimento di dati trasparente e affidabile (implementando anche un controllo degli errori e delle perdite) tra due host. È il primo livello realmente end-to-end, cioè da host sorgente a destinatario.Si occupa di:
+
+stabilire, mantenere e terminare una connessione, garantendo il corretto e ottimale funzionamento della sottorete di comunicazione;
+controllo della congestione: evitare che troppi pacchetti dati arrivino allo stesso router contemporaneamente con effetto di perdita di pacchetti stessi.A differenza dei livelli precedenti, che si occupano di connessioni tra nodi contigui di una rete, il Trasporto (a livello logico) si occupa solo del punto di partenza e di quello finale.
+Si occupa anche di effettuare la frammentazione dei dati provenienti dal livello superiore in pacchetti, detti segmenti, e trasmetterli in modo efficiente e affidabile usando il livello rete e isolando da questo i livelli superiori. Inoltre, si preoccupa di ottimizzare l'uso delle risorse di rete e di prevenire la congestione.
+La sua unità dati fondamentale è il segmento, user datagram o pacchetto.
+
+
+==== Livello 5: sessione (Session Layer) ====
+
+Obiettivo: controllare la comunicazione tra applicazioni. Instaurare, mantenere e abbattere connessioni (sessioni) tra applicazioni cooperanti. Si occupa anche della sincronia di invio/ricezione messaggi.Esso consente di aggiungere ai servizi forniti dal livello di trasporto servizi più avanzati, quali la gestione del dialogo (mono o bidirezionale), la gestione del token (per effettuare mutua esclusione) o la sincronizzazione (inserendo dei checkpoint in modo da ridurre la quantità di dati da ritrasmettere in caso di gravi malfunzionamenti).
+Si occupa anche di inserire dei punti di controllo nel flusso dati: in caso di errori nell'invio dei pacchetti, la comunicazione riprende dall'ultimo punto di controllo andato a buon fine.
+
+
+==== Livello 6: presentazione (Presentation Layer) ====
+
+Obiettivo: trasformare i dati forniti dalle applicazioni in un formato standardizzato e offrire servizi di comunicazione comuni, come la crittografia, la compressione del testo e la riformattazione.Esso consente di gestire la sintassi dell'informazione da trasferire. E sono previste tre diverse sintassi:
+
+astratta (definizione formale dei dati che gli applicativi si scambiano);
+concreta locale (come i dati sono rappresentati localmente);
+di trasferimento (come i dati sono codificati durante il trasferimento).
+
+
+==== Livello 7: applicazione (Application Layer) ====
+
+Obiettivo: funzione di interfaccia tra utente e macchina.Fornisce un insieme di protocolli che operano a stretto contatto con le applicazioni. Potrebbe essere errato identificare un'applicazione utente come parte del livello applicazione.
+I protocolli delle applicazioni tipiche di questo livello realizzano operazioni come ad esempio:
+
+trasferimento file;
+terminale virtuale;
+posta elettronica.
+
+
+=== Elenco protocolli per livello ===
+Elenco non esaustivo di protocolli di rete e/o tecnologie appartenenti ai vari livelli ISO/OSI:
+
+
+==== Livello 1: fisico ====
+Bluetooth
+DSL
+FDDI
+OTN (fibra ottica)
+RS-232
+Ultra Wide Band
+
+
+==== Livello 2: link ====
+Ethernet
+Wi-Fi
+PPP
+Token ring
+ATM
+
+
+==== Livello 3: rete ====
+IP
+X.25
+IPX
+ICMP
+
+
+==== Livello 4: trasporto ====
+TCP e UDP (usati su IP)
+SPX (usato su IPX)
+
+
+==== Livello 5: sessione ====
+NetBIOS
+SOCKS
+
+
+==== Livello 6: presentazione ====
+PGP
+MIME
+ASCII
+
+
+==== Livello 7: applicazione ====
+Protocolli di servizio:
+DHCP
+DNS
+Finger protocol
+NTP
+SNMP
+LDAPProtocolli di accesso a terminali remoti:
+Telnet
+SSHProtocolli usati per realizzare il servizio di posta elettronica e newsgroup:
+SMTP
+POP
+IMAP
+NNTPProtocolli di trasferimento file:
+FTP
+HTTP
+IRC
+GnutellaI livelli visti precedentemente sono una suddivisione concettuale, ma la loro implementazione non è uniforme; infatti il livello fisico e quello di collegamento di solito sono presenti sulla scheda di interfaccia della rete, mentre il livello di rete ha un'implementazione mista hardware-software.
+
+
+== Confronto con il TCP/IP ==
+
+ISO/OSI è stato progettato per permettere la comunicazione in reti a "commutazione di pacchetto", del tutto simili al paradigma TCP-UDP/IP usato in Unix e nella rete ARPAnet, precorritrice di Internet, paradigma quest'ultimo affermatosi come standard nell'ambito networking.
+Il modello ISO/OSI non è rigido: costituisce, piuttosto, un punto di riferimento per le architetture di rete a pacchetto, che possono distanziarsi più o meno da esso. La differenza sostanziale fra TCP/IP e ISO/OSI consiste nel fatto che nel TCP/IP i livelli di presentazione e di sessione sono esterni alla pila di protocolli (cioè è un'applicazione stand-alone che "usa" TCP/IP per comunicare con altre applicazioni). I livelli sono dunque solo quattro:
+
+livello di applicazione;
+livello di trasporto;
+livello di rete;
+livello di accesso alla rete.
+
+
+== Note ==
+
+
+== Bibliografia ==
+(EN) Ray Denenberg, Data communications and osi, in Library Hi Tech, vol. 8, n. 4, 1990,  pp. 15-32, DOI:10.1108/eb047805.
+(EN) Bill Davey e Robert F. Houghton, Why not OSI?, in IFIP Advances in Information and Communication Technology, vol. 491, Tatnall A., Leslie C. (eds) International Communities of Invention and Innovation, 2016,  pp. 115-121, DOI:10.1007/978-3-319-49463-0_8.
+
+
+== Voci correlate ==
+Architettura di rete
+Management di rete
+Protocollo di rete
+Organizzazione Internazionale per le Standardizzazioni
+
+
+== Altri progetti ==
+
+ Wikimedia Commons contiene immagini o altri file sul modello OSI
+
+
+== Collegamenti esterni ==
+
+ Sito ufficiale, su iso.org. 
+(EN) Opere riguardanti Modello OSI, su Open Library, Internet Archive. 
+(EN) Modello OSI, in Free On-line Dictionary of Computing, Denis Howe. Disponibile con licenza GFDL
+(EN) 35.100 - Open systems interconnection (OSI), su iso.org, Organizzazione internazionale per la normazione.
+		</div>
+		<div class="page_summary" style="margin-top: 3vh;">
+			Il modello OSI (acronimo di Open Systems Interconnection, conosciuto anche come modello ISO/OSI), in telecomunicazioni e informatica, è uno standard stabilito nel 1984 dall'International Organization for Standardization (ISO), il principale ente di standardizzazione internazionale, il quale sentì la necessità di produrre una serie di norme tecniche per legge per reti di calcolatori avviando il progetto per la definizione di un modello di riferimento a formato aperto per l'interconnessione di sistemi di computer (Basic Reference Model o standard ISO 7498).
+Tale modello stabilisce per l'architettura logica di rete, ovvero per le funzioni di comunicazione delle telecomunicazioni o di sistemi informatici, una struttura a strati composta da una pila di protocolli di comunicazione di rete suddivisa in 7 livelli, i quali insieme eseguono tutte le funzionalità della rete, seguendo un modello logico-gerarchico. A livello implementativo lo standard de facto affermatosi per architetture di rete a livelli è invece il TCP/IP.
+
+
+		</div>
+	</body>
+</html>

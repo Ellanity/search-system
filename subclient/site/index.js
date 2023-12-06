@@ -136,7 +136,7 @@ function fillComponent(component, fill_data) {
 	component.appendChild(fill_data);
 }
 
-let languages = {"ru": "Русский", "it": "Итальянский"}
+let languages = {"ru": "Русский", "it": "Итальянский", "": "Язык не определен"}
 
 // make cards of documents
 function makeCardsFromResponsData() {

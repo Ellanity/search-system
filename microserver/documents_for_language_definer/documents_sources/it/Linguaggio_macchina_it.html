@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html class="client" lang="it">
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			Linguaggio macchina
+		</title>
+	</head>
+	<body>
+		<div class="page_content">
+			Лабораторная 2
+			<hr/>
+			Il linguaggio macchina (o codice macchina), in informatica, indica il linguaggio in cui sono scritti i programmi eseguibili per computer: può venire classificato come linguaggio di programmazione, sebbene quest'ultima espressione sia più spesso riservata per indicare i linguaggi di alto livello con cui si scrivono programmi non direttamente eseguibili, ma che richiedono una traduzione in linguaggio macchina, per es. per mezzo di un compilatore.
+
+
+== Descrizione ==
+
+Il linguaggio macchina è basato su un alfabeto detto binario in quanto comprende due soli simboli, generalmente indicati con 0 e 1: un simbolo di questo alfabeto viene detto bit. Il processore (o CPU) è quella componente hardware di un computer che è in grado di eseguire i programmi scritti in linguaggio macchina. In altre parole, con linguaggio macchina sono definite l'insieme di istruzioni fondamentali che un processore è in grado di compiere (instruction set), in cui i codici di programmi da eseguire devono essere tradotti. In particolare, i linguaggi a più basso livello si ottengono come semplice codifica (tabella di associazione) a partire dal linguaggio macchina in un crescendo di astrazione.
+
+Come nelle lingue naturali, nel linguaggio macchina i simboli dell'alfabeto utilizzato (1 e 0) sono organizzati in "parole" che a loro volta costituiscono "frasi". Le frasi del linguaggio macchina sono dette istruzioni; ognuna di esse ordina al processore di eseguire un'azione elementare afferente allo stato interno del computer, come la lettura di una locazione di memoria oppure il calcolo della somma dei valori contenuti in due registri.
+Le frasi sono generalmente costituite da una parola iniziale detta codice operativo iniziale, che indica il tipo di azione da eseguire, seguita da altre parole che specificano gli eventuali parametri (o dati) a cui l'azione deve essere applicata (per esempio "SOMMA"-"15"-"20"). Se consideriamo la prima parola come "verbo" della frase, possiamo dire per analogia che il linguaggio macchina prevede solo verbi all'imperativo; non a caso, i linguaggi di programmazione che presentano questa caratteristica sono detti proprio linguaggi imperativi. I processori tradizionali erano in grado di eseguire una sola istruzione per volta; attualmente si stanno diffondendo tecnologie (come quella dei processori superscalari) che consentono l'esecuzione di più istruzioni in parallelo. Le istruzioni che possono comparire in un programma in linguaggio macchina descrivono azioni semplici quali ad esempio "somma", "dividi" o "confronta".
+
+
+=== Compatibilità ===
+L'espressione "il linguaggio macchina" è, strettamente parlando, scorretta; infatti, ogni modello di processore è in grado di comprendere un proprio particolare linguaggio macchina. Tuttavia, pur variando nella sintassi specifica, i linguaggi macchina di tutti i processori sono basati su un insieme di principi e di concetti analoghi.
+Se un determinato processore P1 comprende esattamente il linguaggio di un altro processore P2, si dice che P1 è compatibile con P2. Per esempio, i processori cosiddetti x86 sono chiamati in questo modo perché sono in grado di comprendere un linguaggio macchina inventato dalla Intel e in seguito usato anche su processori AMD, VIA o Cyrix. È da notare come diversi processori compatibili non debbano esserlo anche a livello hardware: i processori Intel e AMD x86 interpretano lo stesso linguaggio macchina anche se internamente sono molto diversi.
+
+
+=== Rapporto con l'assembly ===
+
+Il linguaggio macchina viene spesso confuso con il linguaggio assembly ma in realtà quest'ultimo  è un linguaggio di programmazione a basso livello che, analogamente ai linguaggi ad alto livello come C, C++, C#, Pascal, Java, Python, Visual Basic, Ruby, ecc., richiede un processo di traduzione. A differenza di questi ultimi, l'assembly consente una traduzione particolarmente semplice che trasforma ogni istruzione dell'assembly, in modo univoco, in una istruzione in linguaggio macchina.
+I codici operativi e i dati nel linguaggio macchina sono pattern (stringhe) di bit. L'assembly utilizza al loro posto istruzioni mnemoniche, che rendono più semplice al programmatore umano lo sviluppo e il debug di programmi. Per esempio, sul processore Z80, il codice macchina 00000101b (05h) corrisponde all'ordine di decrementare il numero contenuto nel registro B, mentre in linguaggio assembly lo stesso ordine si scrive DEC B.
+
+
+=== Esempi di notazione ===
+I codici macchina si possono trascrivere, per comodità anche in notazione esadecimale: ad esempio sempre nello Z80 il susseguirsi di codici:
+
+3E 41 D3
+
+è fissa mentre in altri essa varia da istruzione a istruzione. Anche l'organizzazione dei pattern varia moltissimo.
+Come esempio specifico possiamo prendere l'architettura MIPS. Le istruzioni di questa architettura sono tutte composte da 32 bit (o 4 byte). I primi 6 bit contengono il codice operativo. Le istruzioni di tipo J (da jump: salto) ed I (immediate) sono completamente specificate dal campo op mentre le istruzioni di tipo R (registro) comprendono un campo addizionale chiamato func che codifica la specifica funzione da eseguire. Il formato dettagliato delle istruzioni è il seguente:
+
+   6      5     5     5     5      6 bit
+[  op  |  rs |  rt | address/immediate]  tipo I
+[  op  |        target address        ]  tipo J
+[  op  |  rs |  rt |  rd |shamt| funct]  tipo R
+
+rs, rt, e rd indicano i registri nei quali si trovano gli operandi; shamt sta per "shift amount" mentre address e immediate contengono direttamente degli operandi.
+Per esempio l'operazione di somma dei registri 1 e 2 con memorizzazione del risultato nel registro 6 è codificata come:
+
+[  op  |  rs |  rt |  rd |shamt| funct]
+    0     1     2     6     0     32     forma decimale
+ 000000 00001 00010 00110 00000 100000   forma binaria
+
+Caricamento nel registro 8 di un valore memorizzato nella cella di memoria posta 68 celle dopo quella puntata dal registro 3:
+
+[  op  |  rs |  rt | address/immediate]
+   35     3     8           68           forma decimale
+
+
+== Note ==
+
+
+== Bibliografia ==
+ David Andrew Patterson e John Leroy Hennessy, Il calcolatore: astrazioni e tecnologia, in Struttura e progetto dei calcolatori, 4ª ed., Zanichelli, 2015, ISBN 978-88-08-35202-6.
+ David Andrew Patterson e John Leroy Hennessy, Le istruzioni: il linguaggio dei calcolatori, in Struttura e progetto dei calcolatori, 4ª ed., Zanichelli, 2015, ISBN 978-88-08-35202-6.
+
+
+== Voci correlate ==
+Architettura MIPS
+IBM compatibile
+Instruction set
+Linguaggio assembly
+Microprogrammazione
+Sistema numerico binario
+Unità centrale di elaborazione
+
+
+== Collegamenti esterni ==
+
+ linguaggio macchina, in Enciclopedia della Matematica, Istituto dell'Enciclopedia Italiana, 2013. 
+(EN) machine code, in Free On-line Dictionary of Computing, Denis Howe. Disponibile con licenza GFDL
+		</div>
+		<div class="page_summary" style="margin-top: 3vh;">
+			Il linguaggio macchina (o codice macchina), in informatica, indica il linguaggio in cui sono scritti i programmi eseguibili per computer: può venire classificato come linguaggio di programmazione, sebbene quest'ultima espressione sia più spesso riservata per indicare i linguaggi di alto livello con cui si scrivono programmi non direttamente eseguibili, ma che richiedono una traduzione in linguaggio macchina, per es. per mezzo di un compilatore.
+
+
+		</div>
+	</body>
+</html>
