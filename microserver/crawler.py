@@ -13,15 +13,15 @@ import codecs
 import json
 import math
 
-
-# web robot to index files
-# searches for files after each set time interval 
-# and creates search images of new documents
-
-# this does not use the database context, 
-# it only works with the specified list and directory, 
-# the app itself must save the data that the crawler generated.
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# web robot to index files                                        #
+# searches for files after each set time interval                 #
+# and creates search images of new documents                      #
+#                                                                 #
+# this does not use the database context,                         #
+# it only works with the specified list and directory,            #
+# the app itself must save the data that the crawler generated.   #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 class WebСrawler:
 
@@ -37,7 +37,6 @@ class WebСrawler:
         self.__documents_urls_to_delete = []
         
         # server dict
-        
 # NEED TO REWORK IT, SAVE IN JSON IN COMMON DATA
         self.__written_in_dictionary = []
         self.__deleted_from_dictionary = []
@@ -51,8 +50,7 @@ class WebСrawler:
         self.__init_system_variables__()
         self.__init_server_dictionary__()
 
-        # 
-        self.language_definer_ngrams = None
+        # language definer 
         self.__init_language_definers__()
         
         # states
@@ -109,6 +107,8 @@ class WebСrawler:
         self.language_definer_ngrams = DefinerNGrammsMethod()
         self.language_definer_ngrams.updateDefinerDocumentsProfiles()
         self.language_definer_alphabet = DefinerAlphabetMethod()
+        self.language_definer_neural_network = DefinerNeuralNetworkMethod()
+        self.language_definer_neural_network.updateDefinerNeuralNetworkWeights()
 
     def __init_server_dictionary__(self):
         # files of dictionary parts (one part is one character in allowed_dictionary)
@@ -245,11 +245,21 @@ class WebСrawler:
             reference_string=ALLOWED_DICTIONARY)
             
         # split text by spaces and getting words with counts
-        # list_of_lexems = re.split(DELIMETERS_OF_TEXT, text_from_document, flags=re.IGNORECASE)
-        # list_of_lexems = [lexem for lexem in list_of_lexems if lexem != ""]
         list_of_lexems = re.sub(r'(?:(?!\u0301)[\W\d_])+', ' ', ("".join(character for character in text_from_document if character in ALLOWED_DICTIONARY)))
         list_of_lexems = [lexem for lexem in list_of_lexems.split(" ") if len(lexem) > 2]
         
+        # # # # # 
+        # need to remake dict_of_lexem formation 
+        # 
+        # tokenize words
+        # lemmatise words
+        # delete stop words 
+        #  
+        # # # # # nlt for text processing 
+        # from nltk import WordNetLemmatizer # lemmatise
+        # from nltk.tokenize import word_tokenize # tokenize
+        # lemmatize.lemmatize(word) for word in text if not word in set(stopwords.words("stopwords"))
+
         dict_of_lexems = {
             lexem: {
                 "count": list_of_lexems.count(lexem), 
@@ -266,7 +276,7 @@ class WebСrawler:
         except: pass
         try: language_defined_by_alphabet_method = self.language_definer_alphabet.define(html_document_without_tags)
         except: pass
-        try: language_defined_by_neural_network_method = DefinerNeuralNetworkMethod.define(html_document_without_tags)
+        try: language_defined_by_neural_network_method = self.language_definer_neural_network.define(html_document_without_tags)
         except: pass
 
         search_image_document = {

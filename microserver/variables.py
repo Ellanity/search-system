@@ -21,17 +21,22 @@ ALLOWED_DICTIONARY="ёйцукенгшщзхъфывапролджэячсмит
 
 DELIMETERS_OF_TEXT=" |.|,|_|-|!|&|?|\"|'|%|^|*|(|)|@|#|~|:|/|\\|=|$"
 
+
 # language_definer
 DOCUMENTS_FOR_DEFINER_DIRECTORY_URL="documents_for_language_definer"
 DOCUMENTS_FOR_DEFINER_SOURCES_DIRECTORY_URL="documents_sources"
 DOCUMENTS_FOR_DEFINER_PROFILES_DIRECTORY_URL="documents_profiles"
-NGRAMM_SIZE = 4
-# # # # #
+NEURAL_NETWORK_DATA_DIRECTORY_URL="neural_network_data"
+# # # # # Languages 
 LANGUAGES_TO_DEFINE=("ru", "it")
 LANGUAGES_ALPHABETS={"ru": "ёйцукенгшщзхъфывапролджэячсмитьибю",
                      "it": "abcdefghijklmnopqrstuvwxyzàèéìíîòóùú"}
+# # # # # Constants for definers
+NGRAMM_SIZE = 4 
+MAX_TOKEN_LENGTH = 20 
+MAX_TOKEN_INDEX = ((MAX_TOKEN_LENGTH + 1) / 2) * MAX_TOKEN_LENGTH * len(ALLOWED_DICTIONARY) + 2 
 
-#analyzer
+# Analyzer
 SERVER_DICTIONARY_DIRECTORY_URL="server_dictionary"
 
 # http

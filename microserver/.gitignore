@@ -1,5 +1,5 @@
 # database 
-*.db
+documents.db
 documents.db-journal
 
 # project directories that must be filled with user of system

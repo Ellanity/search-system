@@ -1,17 +1,23 @@
+# custom lib of global variables 
 from variables import *
+from text_processor import TextProcessor
+
+# work with files
 import os   
 import stat
 import shutil
 
+# work with text
 import re
 import json
 import codecs
+
 
 class Definer(object):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__init_system_variables__()
-
+        
     @staticmethod
     def __init_system_variables__():
         # check variables
@@ -32,6 +38,9 @@ class Definer(object):
         # alphabet
         if not LANGUAGES_ALPHABETS: 
             raise Exception("Can not find variable LANGUAGES_ALPHABETS")
+        # neural network
+        if not NEURAL_NETWORK_DATA_DIRECTORY_URL: 
+            raise Exception("Can not find variable NEURAL_NETWORK_DATA_DIRECTORY_URL")
         
         # for text handling
         if not ALLOWED_DICTIONARY: 
@@ -45,16 +54,18 @@ class Definer(object):
         Definer._paths = {
             "DOCUMENTS_DIRECTORY_URL": os.path.join(Definer.__working_directory, DOCUMENTS_DIRECTORY_URL),
             "DOCUMENTS_FOR_DEFINER_SOURCES_DIRECTORY_URL": os.path.join(Definer.__working_directory, 
-                         DOCUMENTS_FOR_DEFINER_DIRECTORY_URL, DOCUMENTS_FOR_DEFINER_SOURCES_DIRECTORY_URL),
+                DOCUMENTS_FOR_DEFINER_DIRECTORY_URL, DOCUMENTS_FOR_DEFINER_SOURCES_DIRECTORY_URL),
             "DOCUMENTS_FOR_DEFINER_PROFILES_DIRECTORY_URL": os.path.join(Definer.__working_directory, 
-                         DOCUMENTS_FOR_DEFINER_DIRECTORY_URL, DOCUMENTS_FOR_DEFINER_PROFILES_DIRECTORY_URL)
+                DOCUMENTS_FOR_DEFINER_DIRECTORY_URL, DOCUMENTS_FOR_DEFINER_PROFILES_DIRECTORY_URL),
+            "NEURAL_NETWORK_DATA_DIRECTORY_URL": os.path.join(Definer.__working_directory, 
+                DOCUMENTS_FOR_DEFINER_DIRECTORY_URL, NEURAL_NETWORK_DATA_DIRECTORY_URL)
         }
 
         for _, path in Definer._paths.items():
             is_exist = os.path.exists(path)
             if not is_exist:
                 os.makedirs(path)
-
+    
     # just find documents in directory, return array of pathes 
     # in path last part is filename 
     @staticmethod
@@ -214,6 +225,8 @@ class DefinerNGrammsMethod(Definer):
         ngrams_profiles = DefinerNGrammsMethod.__documentsNGramsProfilesFromSources()
         self.__saveNgramsProfiles(ngrams_profiles)
 
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
     @staticmethod
     def __calculatingTheOutOfPlaceMeasureBetweenTwoProfiles(ngram_profile_1, ngram_profile_2):
         distance_measure = 0
@@ -294,10 +307,159 @@ class DefinerAlphabetMethod(Definer):
         print("alph: ", result)
         return result
 
-class DefinerNeuralNetworkMethod(Definer):
+
+import numpy as np
+import keras
+from keras.layers import Dense
+from keras.models import model_from_json
+
+# for grafics 
+import matplotlib.pyplot as plt
+
+class DefinerNeuralNetworkMethod(Definer):    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        DefinerNeuralNetworkMethod.model_path = \
+            os.path.join(Definer._paths["NEURAL_NETWORK_DATA_DIRECTORY_URL"], "model.json")
+        DefinerNeuralNetworkMethod.weights_path = \
+            os.path.join(Definer._paths["NEURAL_NETWORK_DATA_DIRECTORY_URL"], "weights.h5")
+
+    class NeuralNetwork:
+                        
+        def __init__(self):
+            pass
+
+        @staticmethod   
+        def defineTextLanguage(text: str) -> str:
+            # create input data for prediction
+            tokens_with_indexes = DefinerNeuralNetworkMethod.NeuralNetwork.tokenizeText(text)
+            index_of_token_for_prediction = 0
+            for token in tokens_with_indexes.keys():
+                index_of_token_for_prediction = tokens_with_indexes[token]
+                break
+
+            # load model from file
+            model_path = DefinerNeuralNetworkMethod.model_path
+            weights_path = DefinerNeuralNetworkMethod.weights_path
+            if not os.path.exists(model_path) or not os.path.exists(weights_path):
+                raise Exception("Need to train model before predict")
+            
+            # load model
+            loaded_model_json = None
+            
+            print(model_path)
+            with codecs.open(model_path, 
+                             mode="r", 
+                             encoding="utf-8") as model_file:
+                loaded_model_json = model_file.read()
+                model = model_from_json(loaded_model_json)
+
+            if model is None:
+                raise Exception("Model of neural network was not loaded")
+            # load weights
+            model.load_weights(weights_path)
+
+            # predict
+            result_of_prediction = model.predict(np.array([index_of_token_for_prediction]))
+            expected_results = DefinerNeuralNetworkMethod.NeuralNetwork.getExpectedResultsForNetworkWork()
+            language, language_value = min(expected_results.items(), key=lambda x: abs(result_of_prediction - x[1]))
+            print("predicted: ", result_of_prediction, 
+                  "in_results: ", language_value)
+            print(language)
+            return language
+
+        @staticmethod           
+        def tokenizeText(text: str) -> dict:
+            tokens = TextProcessor.tokenizeText(text)
+            
+            def normilizeTokens(tokens: dict) -> dict:
+                for token in tokens.keys():
+                    tokens[token] = tokens[token] / MAX_TOKEN_INDEX 
+            
+            normilizeTokens(tokens)
+            # print(tokens)
+            return tokens 
+
+        @staticmethod    
+        def getExpectedResultsForNetworkWork():
+            quantity_of_results = max(1, (len(LANGUAGES_TO_DEFINE) - 1))
+            expected_results = {}
+            num_of_result = 0
+            for result in LANGUAGES_TO_DEFINE:
+                expected_results[result] = (1 / quantity_of_results) * num_of_result
+                num_of_result += 1
+            return expected_results
+
+        @staticmethod    
+        def createNetwork():
+            model = keras.Sequential()
+            model.add(layer=Dense(units=1,
+                                  input_shape=(1,), 
+                                  activation="exponential"))
+            model.compile(loss="mean_squared_error",
+                          optimizer=keras.optimizers.Adam(0.001))
+            return model
+
+        @staticmethod    
+        def getDataForTraining() -> dict:
+### rewrite to get texts from files
+# make flexible formatting of returned dict 
+            text_ru = "этот текст написан на русском языке он очень длинный для обучения сети хоть чуть чуть"
+            text_it = "questo testo è scritto in russo è molto lungo per lapprendimento della rete almeno un po"
+
+            ru_tokens = DefinerNeuralNetworkMethod.NeuralNetwork.tokenizeText(text_ru)
+            it_tokens = DefinerNeuralNetworkMethod.NeuralNetwork.tokenizeText(text_it)
+            
+            expected_results = DefinerNeuralNetworkMethod.NeuralNetwork.getExpectedResultsForNetworkWork()
+            # print(expected_results)
+
+# need to fix formmating
+            data_to_train = {"languages": {
+                                "ru": ru_tokens, 
+                                "it": it_tokens
+                                }, 
+                             "results": expected_results}
+            
+            data_for_input_layer: list = [] 
+            data_for_otput_layer: list = [] 
+            for language in data_to_train["languages"].keys():
+                for token in data_to_train["languages"][language].keys():
+                    data_for_input_layer.append(data_to_train["languages"][language][token])
+                    data_for_otput_layer.append(data_to_train["results"][language])
+
+            return {"input": data_for_input_layer, "output": data_for_otput_layer}
+
+        @staticmethod    
+        def trainNetwork(data_to_train):
+            model = DefinerNeuralNetworkMethod.NeuralNetwork.createNetwork()
+            history = model.fit(np.array(data_to_train["input"]),
+                                np.array(data_to_train["output"]),
+                                epochs=500,
+                                verbose=False)
+            
+            plt.plot(history.history["loss"])
+            plt.grid(True)
+            plt.show()
+
+            # save model
+            model_json = model.to_json()
+            with codecs.open(DefinerNeuralNetworkMethod.model_path, 
+                             mode="w+", 
+                             encoding="utf-8") as model_file:
+                model_file.write(model_json)
+            
+            # save weights
+            model.save_weights(DefinerNeuralNetworkMethod.weights_path)
+            
+    @staticmethod
+    def updateDefinerNeuralNetworkWeights() -> None:
+        data_for_training = DefinerNeuralNetworkMethod.NeuralNetwork.getDataForTraining()
+        DefinerNeuralNetworkMethod.NeuralNetwork.trainNetwork(data_for_training)
+        # write weights in file
+        return
 
     @staticmethod
     def define(text: str) -> str:
-        return "ru"
+        language = DefinerNeuralNetworkMethod.NeuralNetwork.defineTextLanguage(text)
+        return language
