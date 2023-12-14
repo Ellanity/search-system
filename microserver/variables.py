@@ -13,8 +13,8 @@ SEARCH_IMAGES_DOCUMENTS_DIRECTORY_URL="search_images_documents"
 # CRAWLER_TIMESPAN_SEC=300
 CRAWLER_TIMESPAN_SEC=600
 
-# CRAWLER_DOCUMENTS_READD_TIMESPAN_SEC=200
-CRAWLER_DOCUMENTS_READD_TIMESPAN_SEC=86400
+CRAWLER_DOCUMENTS_READD_TIMESPAN_SEC=200
+# CRAWLER_DOCUMENTS_READD_TIMESPAN_SEC=86400
 
 ALLOWED_DICTIONARY="ёйцукенгшщзхъфывапролджэячсмитьибюabcdefghijklmnopqrstuvwxyzàèéìíîòóùú "
 # ALLOWED_DICTIONARY="ёйцукенгшщзхъфывапролджэячсмитьибю "
@@ -33,8 +33,9 @@ LANGUAGES_ALPHABETS={"ru": "ёйцукенгшщзхъфывапролджэяч
                      "it": "abcdefghijklmnopqrstuvwxyzàèéìíîòóùú"}
 # # # # # Constants for definers
 NGRAMM_SIZE = 4 
-MAX_TOKEN_LENGTH = 20 
-MAX_TOKEN_INDEX = ((MAX_TOKEN_LENGTH + 1) / 2) * MAX_TOKEN_LENGTH * len(ALLOWED_DICTIONARY) + 2 
+MAX_TOKEN_LENGTH = 25 
+MAX_TOKEN_INDEX = int(((MAX_TOKEN_LENGTH + 1) / 2) * MAX_TOKEN_LENGTH * len(ALLOWED_DICTIONARY) + 2)
+MAX_NUM_OF_TOKENS_IN_INPUT_SEQUENCE_FOR_NN = 50 # num of neurons on input layer
 
 # Analyzer
 SERVER_DICTIONARY_DIRECTORY_URL="server_dictionary"

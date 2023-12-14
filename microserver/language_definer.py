@@ -41,6 +41,8 @@ class Definer(object):
         # neural network
         if not NEURAL_NETWORK_DATA_DIRECTORY_URL: 
             raise Exception("Can not find variable NEURAL_NETWORK_DATA_DIRECTORY_URL")
+        if not MAX_NUM_OF_TOKENS_IN_INPUT_SEQUENCE_FOR_NN: 
+            raise Exception("Can not find variable MAX_NUM_OF_TOKENS_IN_INPUT_SEQUENCE_FOR_NN")
         
         # for text handling
         if not ALLOWED_DICTIONARY: 
@@ -79,6 +81,7 @@ class Definer(object):
     
     # from html to text, for test documents
     # definers must get already cleared text 
+    """
     @staticmethod
     def _getClearTextFromHtml(html_text):
         def keepCharactersInStringWithRegex(input_string, reference_string):
@@ -94,6 +97,7 @@ class Definer(object):
         text_from_document_re = re.sub(" +", " ", text_from_document_re)        
         
         return text_from_document_re
+    """
             
     # get source documents from dir, divided by language
     @staticmethod
@@ -164,7 +168,8 @@ class DefinerNGrammsMethod(Definer):
                     with codecs.open(current_path, "r", encoding="utf-8") as file:
                         html_document_with_tags = file.read()
                         
-                html_text = DefinerNGrammsMethod._getClearTextFromHtml(html_document_with_tags)
+                html_text = TextProcessor.makeClearedTextFromRawHtmlText(html_document_with_tags)
+                # html_text = DefinerNGrammsMethod._getClearTextFromHtml(html_document_with_tags)
                 
                 ngrams_profiles[language][os.path.join(os.path.split(current_path)[1])] = \
                     DefinerNGrammsMethod.__createNGramsProfileForText(html_text)
@@ -284,7 +289,8 @@ class DefinerAlphabetMethod(Definer):
 
     @staticmethod
     def define(text: str) -> str:
-        text = Definer._getClearTextFromHtml(text)
+        # text = Definer._getClearTextFromHtml(text)
+        text = TextProcessor.makeClearedTextFromRawHtmlText(text)
         
         chars = {}
         for char in text:
@@ -307,15 +313,20 @@ class DefinerAlphabetMethod(Definer):
         print("alph: ", result)
         return result
 
+# https://stackoverflow.com/questions/40690598/can-keras-with-tensorflow-backend-be-forced-to-use-cpu-or-gpu-at-will
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 import numpy as np
 import keras
-from keras.layers import Dense
+from keras.layers import Dense, Embedding, LSTM
 from keras.models import model_from_json
+from keras.utils import pad_sequences, to_categorical
 
-# for grafics 
+# for charts 
 import matplotlib.pyplot as plt
 
+# https://cloud.croc.ru/blog/about-technologies/keras-i-tensorflow-klassifikatsiya-teksta/
 class DefinerNeuralNetworkMethod(Definer):    
 
     def __init__(self, *args, **kwargs):
@@ -333,22 +344,36 @@ class DefinerNeuralNetworkMethod(Definer):
         @staticmethod   
         def defineTextLanguage(text: str) -> str:
             # create input data for prediction
+            text = TextProcessor.makeClearedTextFromRawHtmlText(text)
             tokens_with_indexes = DefinerNeuralNetworkMethod.NeuralNetwork.tokenizeText(text)
-            index_of_token_for_prediction = 0
-            for token in tokens_with_indexes.keys():
-                index_of_token_for_prediction = tokens_with_indexes[token]
-                break
+            
+            sequences: list = []
+            sequences.append(list())
 
+            count_of_tokens_in_current_list = 0
+            for token_index in list(tokens_with_indexes.values()):
+                sequences[-1].append(token_index)
+                count_of_tokens_in_current_list += 1
+                if count_of_tokens_in_current_list >= MAX_NUM_OF_TOKENS_IN_INPUT_SEQUENCE_FOR_NN:
+                    sequences.append(list())
+            
+            data_for_input_layer = pad_sequences(sequences=sequences, 
+                                                 maxlen=MAX_NUM_OF_TOKENS_IN_INPUT_SEQUENCE_FOR_NN)
+
+            # print(data_for_input_layer)
+            
             # load model from file
+
             model_path = DefinerNeuralNetworkMethod.model_path
             weights_path = DefinerNeuralNetworkMethod.weights_path
             if not os.path.exists(model_path) or not os.path.exists(weights_path):
                 raise Exception("Need to train model before predict")
             
             # load model
+
             loaded_model_json = None
             
-            print(model_path)
+            # print("model_path: ", model_path)
             with codecs.open(model_path, 
                              mode="r", 
                              encoding="utf-8") as model_file:
@@ -357,17 +382,43 @@ class DefinerNeuralNetworkMethod(Definer):
 
             if model is None:
                 raise Exception("Model of neural network was not loaded")
+            
             # load weights
             model.load_weights(weights_path)
 
             # predict
-            result_of_prediction = model.predict(np.array([index_of_token_for_prediction]))
+            
+            """
+            predictions = []
+            for sequence in data_for_input_layer:
+                prediction = model.predict(np.array([sequence,]))
+                predictions.append(prediction)
+            """
+            predictions = model.predict(data_for_input_layer)
+            # print(predictions)
             expected_results = DefinerNeuralNetworkMethod.NeuralNetwork.getExpectedResultsForNetworkWork()
-            language, language_value = min(expected_results.items(), key=lambda x: abs(result_of_prediction - x[1]))
-            print("predicted: ", result_of_prediction, 
-                  "in_results: ", language_value)
-            print(language)
-            return language
+            
+            # # # # # most common language 
+            # for evert predict (it returns result for every language) 
+            # finding indexd of max value
+            indexes = []
+            for prediction in predictions:
+                max_predicted_value = max(prediction)
+                index_of_max_predicted_value = 0
+                for index in prediction:
+                    if index == max_predicted_value:
+                        break
+                    index_of_max_predicted_value += 1
+                indexes.append(index_of_max_predicted_value)
+
+            # print(indexes.count(0), indexes.count(1))
+            most_common_index = max(set(indexes), key = indexes.count)
+            
+            for language in expected_results:
+                if expected_results[language] == most_common_index:
+                    return language
+                    
+            return ""
 
         @staticmethod           
         def tokenizeText(text: str) -> dict:
@@ -377,71 +428,116 @@ class DefinerNeuralNetworkMethod(Definer):
                 for token in tokens.keys():
                     tokens[token] = tokens[token] / MAX_TOKEN_INDEX 
             
-            normilizeTokens(tokens)
-            # print(tokens)
+            # normilizeTokens(tokens)
             return tokens 
 
         @staticmethod    
         def getExpectedResultsForNetworkWork():
-            quantity_of_results = max(1, (len(LANGUAGES_TO_DEFINE) - 1))
+            # quantity_of_results = max(1, (len(LANGUAGES_TO_DEFINE) - 1))
             expected_results = {}
             num_of_result = 0
             for result in LANGUAGES_TO_DEFINE:
-                expected_results[result] = (1 / quantity_of_results) * num_of_result
+                expected_results[result] = num_of_result # (1 / quantity_of_results) * num_of_result
                 num_of_result += 1
             return expected_results
 
         @staticmethod    
         def createNetwork():
+            # model 1
+            """
             model = keras.Sequential()
             model.add(layer=Dense(units=1,
                                   input_shape=(1,), 
                                   activation="exponential"))
             model.compile(loss="mean_squared_error",
                           optimizer=keras.optimizers.Adam(0.001))
+            """
+            # model 2
+            model = keras.Sequential()
+            model.add(Embedding(MAX_TOKEN_INDEX, MAX_NUM_OF_TOKENS_IN_INPUT_SEQUENCE_FOR_NN))
+            model.add(LSTM(32, dropout=0.2, recurrent_dropout=0.2))
+            model.add(Dense(len(LANGUAGES_TO_DEFINE), activation='sigmoid'))
+
+            model.compile(loss='binary_crossentropy',
+                        optimizer='adam',
+                        metrics=['accuracy'])
+
             return model
 
         @staticmethod    
         def getDataForTraining() -> dict:
-### rewrite to get texts from files
-# make flexible formatting of returned dict 
-            text_ru = "этот текст написан на русском языке он очень длинный для обучения сети хоть чуть чуть"
-            text_it = "questo testo è scritto in russo è molto lungo per lapprendimento della rete almeno un po"
 
-            ru_tokens = DefinerNeuralNetworkMethod.NeuralNetwork.tokenizeText(text_ru)
-            it_tokens = DefinerNeuralNetworkMethod.NeuralNetwork.tokenizeText(text_it)
-            
-            expected_results = DefinerNeuralNetworkMethod.NeuralNetwork.getExpectedResultsForNetworkWork()
-            # print(expected_results)
+            sources_docs_paths = Definer._getSourcesDocumentsPaths()
 
-# need to fix formmating
-            data_to_train = {"languages": {
-                                "ru": ru_tokens, 
-                                "it": it_tokens
-                                }, 
-                             "results": expected_results}
-            
+            texts_for_training = {}
+
+            for language in LANGUAGES_TO_DEFINE:
+                texts_for_training[language] = list()
+                texts_for_training[language].append(list())
+
+            tokens_vocabulary = set()
+
+            for language in sources_docs_paths.keys():
+
+                for current_path in sources_docs_paths[language]:
+                    print("tokenizing text: ", current_path)
+                    html_document_with_tags = ""
+                
+                    if os.path.isfile(current_path):
+                        with codecs.open(current_path, "r", encoding="utf-8") as file:
+                            html_document_with_tags = file.read()
+                            
+                    html_text = TextProcessor.makeClearedTextFromRawHtmlText(html_document_with_tags)
+                    
+                    list_of_indexes_from_text = \
+                        list(DefinerNeuralNetworkMethod.NeuralNetwork.tokenizeText(html_text).values())
+                    
+                    # split text by max_len_of_input
+                    count_of_tokens_in_current_list = 0
+                    for token in list_of_indexes_from_text:
+                        texts_for_training[language][-1].append(token)
+                        count_of_tokens_in_current_list += 1
+                        if count_of_tokens_in_current_list >= MAX_NUM_OF_TOKENS_IN_INPUT_SEQUENCE_FOR_NN:
+                            texts_for_training[language].append(list())
+                        # vocab of input data
+                        tokens_vocabulary.add(token)
+
             data_for_input_layer: list = [] 
             data_for_otput_layer: list = [] 
-            for language in data_to_train["languages"].keys():
-                for token in data_to_train["languages"][language].keys():
-                    data_for_input_layer.append(data_to_train["languages"][language][token])
-                    data_for_otput_layer.append(data_to_train["results"][language])
+            expected_results = DefinerNeuralNetworkMethod.NeuralNetwork.getExpectedResultsForNetworkWork()
+            
+            # create pad input and ouputd data
+            sequences = []
+            for language in LANGUAGES_TO_DEFINE:
+                for text in texts_for_training[language]:
+                    sequences.append(np.array(text))
+                # for every input index set output of language 
+                data_for_otput_layer.extend([expected_results[language]] * len(texts_for_training[language]))
+               
+            data_for_input_layer = pad_sequences(sequences=sequences, 
+                              maxlen=MAX_NUM_OF_TOKENS_IN_INPUT_SEQUENCE_FOR_NN)
+            
+            num_of_languages = len(LANGUAGES_TO_DEFINE)
+            data_for_otput_layer = to_categorical(data_for_otput_layer, num_of_languages)
 
-            return {"input": data_for_input_layer, "output": data_for_otput_layer}
+            return {
+                    "input": np.array(data_for_input_layer),
+                    "output": np.array(data_for_otput_layer)
+                }
 
         @staticmethod    
-        def trainNetwork(data_to_train):
+        def trainNetwork(data_to_train) -> None:
             model = DefinerNeuralNetworkMethod.NeuralNetwork.createNetwork()
-            history = model.fit(np.array(data_to_train["input"]),
-                                np.array(data_to_train["output"]),
-                                epochs=500,
-                                verbose=False)
-            
-            plt.plot(history.history["loss"])
-            plt.grid(True)
-            plt.show()
 
+            batch_size = 32
+            epochs = 3 #500
+            # print(data_to_train["input"], data_to_train["output"])
+            history = model.fit(data_to_train["input"],
+                                data_to_train["output"],
+                                batch_size=batch_size,
+                                epochs=epochs,
+                                verbose=True)
+            
             # save model
             model_json = model.to_json()
             with codecs.open(DefinerNeuralNetworkMethod.model_path, 
@@ -452,14 +548,24 @@ class DefinerNeuralNetworkMethod(Definer):
             # save weights
             model.save_weights(DefinerNeuralNetworkMethod.weights_path)
             
+            # show chart 
+            try:
+                plt.plot(history.history["loss"])
+                plt.grid(True)
+                plt.show()
+            except Exception as ex:
+                print(ex)
+
+            return
+ 
     @staticmethod
     def updateDefinerNeuralNetworkWeights() -> None:
         data_for_training = DefinerNeuralNetworkMethod.NeuralNetwork.getDataForTraining()
         DefinerNeuralNetworkMethod.NeuralNetwork.trainNetwork(data_for_training)
-        # write weights in file
         return
 
     @staticmethod
     def define(text: str) -> str:
-        language = DefinerNeuralNetworkMethod.NeuralNetwork.defineTextLanguage(text)
-        return language
+        result = DefinerNeuralNetworkMethod.NeuralNetwork.defineTextLanguage(text)
+        print("nn: ", result)
+        return result

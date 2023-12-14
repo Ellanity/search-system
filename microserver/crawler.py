@@ -108,7 +108,9 @@ class WebСrawler:
         self.language_definer_ngrams.updateDefinerDocumentsProfiles()
         self.language_definer_alphabet = DefinerAlphabetMethod()
         self.language_definer_neural_network = DefinerNeuralNetworkMethod()
-        self.language_definer_neural_network.updateDefinerNeuralNetworkWeights()
+        
+        ### ### UNCOMMENT IF U WONT TO RETATRAIN NEURAL NETWORK ### ###
+        # self.language_definer_neural_network.updateDefinerNeuralNetworkWeights()
 
     def __init_server_dictionary__(self):
         # files of dictionary parts (one part is one character in allowed_dictionary)
