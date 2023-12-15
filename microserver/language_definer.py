@@ -1,16 +1,18 @@
 # custom lib of global variables 
 from variables import *
+
+# all definers must get already cleared text 
 from text_processor import TextProcessor
 
 # work with files
 import os   
 import stat
 import shutil
+import json
+import codecs
 
 # work with text
 import re
-import json
-import codecs
 
 
 class Definer(object):
@@ -79,29 +81,9 @@ class Definer(object):
                 docpaths.append(filepath)
         return docpaths
     
-    # from html to text, for test documents
-    # definers must get already cleared text 
-    """
-    @staticmethod
-    def _getClearTextFromHtml(html_text):
-        def keepCharactersInStringWithRegex(input_string, reference_string):
-            pattern = f"[^{reference_string.lower()}]"
-            filtered_string = re.sub(pattern, "", input_string.lower())
-            return filtered_string.lower()
-        # remove tags and newlines from raw text
-        pattern = re.compile('<.*?>')
-        html_document_without_tags = re.sub(pattern, ' ', html_text)
-        text_from_document_re = keepCharactersInStringWithRegex(
-            input_string=html_document_without_tags.replace('\n', ' '),
-            reference_string=ALLOWED_DICTIONARY)    
-        text_from_document_re = re.sub(" +", " ", text_from_document_re)        
-        
-        return text_from_document_re
-    """
-            
     # get source documents from dir, divided by language
     @staticmethod
-    def _getSourcesDocumentsPaths():
+    def _getSourcesDocumentsPaths() -> dict:
         documents_by_language = {} 
         for language in LANGUAGES_TO_DEFINE:
             language_sources_documents_paths = Definer.__findDocumentsInDirectory(
@@ -111,7 +93,7 @@ class Definer(object):
             
     # get source documents from dir, divided by language
     @staticmethod
-    def _getProfilesDocumentsPaths(definition_type_str):
+    def _getProfilesDocumentsPaths(definition_type_str) -> dict:
         documents_by_language = {} 
         for language in LANGUAGES_TO_DEFINE:
             language_sources_documents_paths = Definer.__findDocumentsInDirectory(
@@ -122,7 +104,7 @@ class Definer(object):
             
     # remove source documents from dir, by type of definition
     @staticmethod
-    def _removeProfileDocumentsByType(definition_type_str): #, lang: bool = False):
+    def _removeProfileDocumentsByType(definition_type_str) -> None:
         
         for language in LANGUAGES_TO_DEFINE:
             language_sources_documents_paths = os.path.join(
@@ -130,18 +112,22 @@ class Definer(object):
                 definition_type_str, 
                 language)
             
-            if os.path.exists(language_sources_documents_paths):
-                def onRmError(func, path, exc_info):
-                # path contains the path of the file that couldn't be removed
-                # let's just assume that it's read-only and unlink it.
-                    os.chmod(path, stat.S_IWRITE)
-                    os.unlink(path)
+            try:
+                if os.path.exists(language_sources_documents_paths):
+                    def onRmError(func, path, exc_info):
+                        # path contains the path of the file that couldn't be removed
+                        # let's just assume that it's read-only and unlink it.
+                        os.chmod(path, stat.S_IWRITE)
+                        os.unlink(path)
+                        os.remove(path)
+
                 shutil.rmtree(language_sources_documents_paths, onerror = onRmError)    
                 # os.remove(language_sources_documents_paths)
             
-            if not os.path.exists(language_sources_documents_paths):
-                os.makedirs(language_sources_documents_paths, stat.S_IWRITE)
-            
+                if not os.path.exists(language_sources_documents_paths):
+                    os.makedirs(language_sources_documents_paths, stat.S_IWRITE)
+            except:
+                pass            
         return 
 
 
@@ -277,11 +263,9 @@ class DefinerNGrammsMethod(Definer):
             ngram_profile=ngram_profile, 
             ngram_profiles=ngram_profiles)
         
-        # print(nearest_document["path"], nearest_document["language"])
         print("ngram: ", nearest_document["language"])
-        
-        return nearest_document["language"]
-
+        result = nearest_document["language"]
+        return result
 
 class DefinerAlphabetMethod(Definer):
     def __init__(self, *args, **kwargs):
@@ -289,7 +273,6 @@ class DefinerAlphabetMethod(Definer):
 
     @staticmethod
     def define(text: str) -> str:
-        # text = Definer._getClearTextFromHtml(text)
         text = TextProcessor.makeClearedTextFromRawHtmlText(text)
         
         chars = {}
@@ -304,8 +287,6 @@ class DefinerAlphabetMethod(Definer):
                 if char in LANGUAGES_ALPHABETS[language]:
                     languages_weights[language] += chars[char]
         
-        # print(chars)
-
         result = max(languages_weights, key=languages_weights.get)
         if languages_weights[result] == 0:
             return ""
@@ -313,9 +294,10 @@ class DefinerAlphabetMethod(Definer):
         print("alph: ", result)
         return result
 
+# TODO: need to make CUDA GPU trainig
 # https://stackoverflow.com/questions/40690598/can-keras-with-tensorflow-backend-be-forced-to-use-cpu-or-gpu-at-will
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
+# os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+# os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 import numpy as np
 import keras
@@ -360,10 +342,7 @@ class DefinerNeuralNetworkMethod(Definer):
             data_for_input_layer = pad_sequences(sequences=sequences, 
                                                  maxlen=MAX_NUM_OF_TOKENS_IN_INPUT_SEQUENCE_FOR_NN)
 
-            # print(data_for_input_layer)
-            
             # load model from file
-
             model_path = DefinerNeuralNetworkMethod.model_path
             weights_path = DefinerNeuralNetworkMethod.weights_path
             if not os.path.exists(model_path) or not os.path.exists(weights_path):
@@ -386,16 +365,8 @@ class DefinerNeuralNetworkMethod(Definer):
             # load weights
             model.load_weights(weights_path)
 
-            # predict
-            
-            """
-            predictions = []
-            for sequence in data_for_input_layer:
-                prediction = model.predict(np.array([sequence,]))
-                predictions.append(prediction)
-            """
+            # predict            
             predictions = model.predict(data_for_input_layer)
-            # print(predictions)
             expected_results = DefinerNeuralNetworkMethod.NeuralNetwork.getExpectedResultsForNetworkWork()
             
             # # # # # most common language 
@@ -433,26 +404,16 @@ class DefinerNeuralNetworkMethod(Definer):
 
         @staticmethod    
         def getExpectedResultsForNetworkWork():
-            # quantity_of_results = max(1, (len(LANGUAGES_TO_DEFINE) - 1))
             expected_results = {}
             num_of_result = 0
             for result in LANGUAGES_TO_DEFINE:
-                expected_results[result] = num_of_result # (1 / quantity_of_results) * num_of_result
+                expected_results[result] = num_of_result
                 num_of_result += 1
             return expected_results
 
         @staticmethod    
         def createNetwork():
-            # model 1
-            """
-            model = keras.Sequential()
-            model.add(layer=Dense(units=1,
-                                  input_shape=(1,), 
-                                  activation="exponential"))
-            model.compile(loss="mean_squared_error",
-                          optimizer=keras.optimizers.Adam(0.001))
-            """
-            # model 2
+            # model 
             model = keras.Sequential()
             model.add(Embedding(MAX_TOKEN_INDEX, MAX_NUM_OF_TOKENS_IN_INPUT_SEQUENCE_FOR_NN))
             model.add(LSTM(32, dropout=0.2, recurrent_dropout=0.2))

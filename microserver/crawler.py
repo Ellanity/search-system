@@ -1,16 +1,21 @@
 # custom modules
 from database import DatabaseDocuments
+
 from language_definer import DefinerNGrammsMethod, DefinerAlphabetMethod, DefinerNeuralNetworkMethod
+from summarizer import SummarizerClassicSummary, SummarizerKeywordsSummary, SummarizerMLSummary
+
 from variables import *
 
 # stadard modules
-from time import time, strptime, mktime, strftime # , gmtime
+from time import time, strptime, mktime, strftime
 from datetime import datetime
-from bs4 import BeautifulSoup
+
+# work with files 
 import os
 import re
 import codecs
 import json
+
 import math
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -26,7 +31,7 @@ import math
 class WebСrawler:
 
     def __init__(self):
-        # documents
+        # Documents
         self.__database = DatabaseDocuments()
         self.__documets_from_db = []
         
@@ -36,24 +41,25 @@ class WebСrawler:
         self.__documents_urls_to_readd = []
         self.__documents_urls_to_delete = []
         
-        # server dict
+        # Server dict (vocabulary)
 # NEED TO REWORK IT, SAVE IN JSON IN COMMON DATA
         self.__written_in_dictionary = []
         self.__deleted_from_dictionary = []
         
-        # system
+        # System
         self.__server_dictionary_common_info_path = ""
         self.__last_start = ""
         self.__working_directory = ""
         
-        # inits
+        # Inits
         self.__init_system_variables__()
         self.__init_server_dictionary__()
-
-        # language definer 
-        self.__init_language_definers__()
+        # # # language definer 
+        self.__init_language_definers__()        
+        # # # summarizer
+        self.__init_summarizers__()
         
-        # states
+        # States
         self.possible_states = {
             0:"wait", 
             1:"indexing_files", 
@@ -111,6 +117,12 @@ class WebСrawler:
         
         ### ### UNCOMMENT IF U WONT TO RETATRAIN NEURAL NETWORK ### ###
         # self.language_definer_neural_network.updateDefinerNeuralNetworkWeights()
+    
+    def __init_summarizers__(self):
+        self.summarizer_classic_summary = SummarizerClassicSummary()
+        self.summarizer_keywords_summary = SummarizerKeywordsSummary()
+        self.summarizer_ml_summary = SummarizerMLSummary()
+
 
     def __init_server_dictionary__(self):
         # files of dictionary parts (one part is one character in allowed_dictionary)
@@ -143,7 +155,6 @@ class WebСrawler:
         self.__documents_urls_to_delete = []
         
         # server dict
-        
         # NEED TO REWORK IT, SAVE IN JSON IN COMMON DATA
         self.__written_in_dictionary = []
         self.__deleted_from_dictionary = []
@@ -280,6 +291,19 @@ class WebСrawler:
         except: pass
         try: language_defined_by_neural_network_method = self.language_definer_neural_network.define(html_document_without_tags)
         except: pass
+    
+        
+        # summarizers
+        summarizer_classic_summary_result = []
+        summarizer_keywords_summary_result = []
+        summarizer_ml_summary_result = []
+
+        try: summarizer_classic_summary_result = self.summarizer_classic_summary.define(html_document_without_tags)
+        except: pass
+        try: summarizer_keywords_summary_result = self.summarizer_keywords_summary.define(html_document_without_tags)
+        except: pass
+        try: summarizer_ml_summary_result = self.summarizer_ml_summary.define(html_document_without_tags)
+        except: pass
 
         search_image_document = {
             "count_of_words": len(list_of_lexems),
@@ -287,6 +311,11 @@ class WebСrawler:
                 "by_ngramms_method": language_defined_by_ngramms_method,
                 "by_alphabet_method": language_defined_by_alphabet_method,
                 "by_neural_network_method": language_defined_by_neural_network_method,
+            },
+            "summarizers": {
+                "summarizer_classic_summary": summarizer_classic_summary_result,
+                "summarizer_keywords_summary_result": summarizer_keywords_summary_result,
+                "summarizer_ml_summary_result": summarizer_ml_summary_result
             },
             "dict_of_lexems": dict_of_lexems
         }
@@ -356,17 +385,7 @@ class WebСrawler:
             
     # server dictionary get
     def __getServerDictionaryParts(self):
-        """
-        server_dictionary_parts = {} # TAKES REALLY A LOT OF RAM, but this solution faster then other (load in query for ex)
-        char_paths = [
-            os.path.join(self.__working_directory, SERVER_DICTIONARY_DIRECTORY_URL, char + ".json") for char in ALLOWED_DICTIONARY
-        ]
         
-        for char_path in char_paths:
-            with open(char_path, "r", encoding="utf-8") as server_dictionary_part_file:
-                json_content = server_dictionary_part_file.read()
-                server_dictionary_parts[char_path] = json.loads(json_content)
-        """
         server_dictionary_parts = {}
         for char in ALLOWED_DICTIONARY:
             char_path = os.path.join(self.__working_directory, SERVER_DICTIONARY_DIRECTORY_URL, char + ".json")
@@ -378,14 +397,7 @@ class WebСrawler:
         
     # server dictionary set
     def __setServerDictionaryParts(self, server_dictionary_parts):   
-        """
-        char_paths = [
-            os.path.join(self.__working_directory, SERVER_DICTIONARY_DIRECTORY_URL, char + ".json") for char in ALLOWED_DICTIONARY
-        ]
-        for char_path in char_paths:
-            with open(char_path, "w", encoding="utf-8") as server_dictionary_part_file:
-                json.dump(server_dictionary_parts[char_path], server_dictionary_part_file)
-        """        
+             
         for char in ALLOWED_DICTIONARY:
             char_path = os.path.join(self.__working_directory, SERVER_DICTIONARY_DIRECTORY_URL, char + ".json")
             with open(char_path, "w", encoding="utf-8") as server_dictionary_part_file:
