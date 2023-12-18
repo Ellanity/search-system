@@ -161,47 +161,165 @@ function makeCardsFromResponsData() {
 		// docname
 		let docname_full = document_in_list.document.replaceAll('\\', '/')
 		let docname_short = docname_full.split('/').pop().replaceAll(' ', '_').replaceAll('.', '_')
-		
-		// similarity
-		let similarity = (document_in_list.similarity * 100).toFixed(2)
-		let language_defined = (document_in_list.language_defined)
-		let by_ngramms_method = language_defined.by_ngramms_method
-		let by_alphabet_method = language_defined.by_alphabet_method
-		let by_neural_network_method = language_defined.by_neural_network_method
-		
-		// words
-		let words_in_document = [] 
-		for (const [word_in_document, weight] of Object.entries(document_in_list.weights))
-			if (weight !== 0)
-				words_in_document.push(word_in_document)
-		
 		// address
 		let document_url = "http://" + document_in_list.server + "/" + docname_full
-		// document_url = "http://" + "kruapan.com:3000" + "/" + docname_full
-			
+
+		// START CARD CREATION	
 		html = `
 			<div class="card" style="margin: 2vh 0 1vw 1vw; z-index: 0; box-shadow: 2px 2px 1px rgba(0, 0, 0, .1);">` +
 				`<div class="card-body">` + 
 					`<h5 class="card-title">` + 
 						`<a href="` + document_url + `" class="card-link" target="_blank">` + document_id + ". " + docname_short + `</a>` + 
-					`</h5>` + 
-					`<p class="card-text" style="margin: 0.4vh;"> Слова: ` + words_in_document.join(', ') + `</p>` + 
-					`<p class="card-text" style="margin: 0.4vh 1vw;"> > Совпадение: ` + similarity + `% ` + `</p>`
-		if (similarity >= 50) {
-			html += `
-					<p class="card-text" style="margin: 0.4vh 1vw;">` +
-						`> Результат является релевантным: <input class="relevant_checkbox" id="checkbox_` + docname_short + `" type="checkbox" checked>` + 
-					`</p>`
-		}
-		else {
-			html += `
-					<p class="card-text" style="margin: 0.4vh 1vw;">` +
-						`> Результат является релевантным: <input class="relevant_checkbox" id="checkbox_` + docname_short + `" type="checkbox">` + 
-					`</p>`
-		}
+					`</h5>` 
+				
+		// SEARCH INFO
+		// words
+		let words_in_document = [] 
+		for (const [word_in_document, weight] of Object.entries(document_in_list.weights))
+			if (weight !== 0)
+				words_in_document.push(word_in_document)
+		// similarity
+		let similarity = (document_in_list.similarity * 100).toFixed(2)
+
+		chapter_name_search = "Результаты поиска"
 		html += `
-					<p class="card-text" style="margin: 0.4vh 0vw 1vh 1vw;">` +
-						`> Язык документа: ` + 
+					<p class="card-text" style="margin: 1vh 0.4vh 1vh 0.4vh;">` + chapter_name_search + `</p>` +
+					`<div class="accordion" id="according_define_language_info_` + docname_short + `_search">` +
+						`<div class="accordion-item">` +
+							`<h2 class="accordion-header" id="heading_` + docname_short + `_search">` +
+								`<button class="accordion-button collapsed"` +
+										`type="button"` +
+										`data-bs-toggle="collapse"` +
+										`data-bs-target="#collapse_` + docname_short + `_search"` +
+										`aria-expanded="false"` +
+										`aria-controls="collapse_` + docname_short + `_search">` +
+									`Подробнее о результатах поиска` +
+								`</button>` +
+							`</h2>` +
+
+							`<div id="collapse_` + docname_short + `_search"` +
+									`class="accordion-collapse collapse"` +
+									`aria-labelledby="heading_` + docname_short + `_search"` +
+									`data-bs-parent="#according_define_language_info_` + docname_short + `_search">` +
+
+								`<div class="accordion-body">` +
+									`<ul class="list-group">` + 
+										`<li class="list-group-item">` + 
+											`Совпавшие слова: ` + 
+											`<i>` +
+												words_in_document.join(', ') +
+											`</i>` +
+										`</li>` +
+										`<li class="list-group-item">` + 
+											`Совпадение поисковых векторов запроса и документа: ` + 
+											`<i>` +
+												similarity + `% ` +
+											`</i>` +
+										`</li>`
+										if (similarity >= 50) {
+											html += `
+											<li class="list-group-item">` +
+													`[Метрики] Результат является релевантным: <input class="relevant_checkbox" id="checkbox_` + docname_short + `" type="checkbox" checked>` + 
+											`</li>`
+										}
+										else {
+											html += `
+											<li class="list-group-item">` +
+												`[Метрики] Результат является релевантным: <input class="relevant_checkbox" id="checkbox_` + docname_short + `" type="checkbox">` + 
+											`</li>`
+										}
+		html += `				
+									</ul>` +
+								`</div>` +
+							`</div>` +
+						`</div>` +
+					`</div>`
+
+
+		// SUMMARY INFO
+		// "summarizers": {"summarizer_classic_summary": [], "summarizer_keywords_summary_result": [], "summarizer_ml_summary_result": []},
+
+		let summarizers = (document_in_list.summarizers)
+		let summarizer_classic_summary = summarizers.summarizer_classic_summary
+		let summarizer_keywords_summary_result = summarizers.summarizer_keywords_summary_result
+		let summarizer_ml_summary_result = summarizers.summarizer_ml_summary_result
+
+		if (!summarizers) {
+			summarizers = []
+		}
+
+		chapter_name_summary = "Краткая сводка из документа"
+		html += `
+					<p class="card-text" style="margin: 1vh 0.4vh 1vh 0.4vh;">` + chapter_name_summary + `</p>` +
+					`<div class="accordion" id="according_define_language_info_` + docname_short + `_summary">` +
+						`<div class="accordion-item">` +
+							`<h2 class="accordion-header" id="heading_` + docname_short + `_summary">` +
+								`<button class="accordion-button collapsed"` +
+										`type="button"` +
+										`data-bs-toggle="collapse"` +
+										`data-bs-target="#collapse_` + docname_short + `_summary"` +
+										`aria-expanded="false"` +
+										`aria-controls="collapse_` + docname_short + `_summary">` +
+									`Подробнее об информации в документе` +
+								`</button>` +
+							`</h2>` +
+
+							`<div id="collapse_` + docname_short + `_summary"` +
+									`class="accordion-collapse collapse"` +
+									`aria-labelledby="heading_` + docname_short + `_summary"` +
+									`data-bs-parent="#according_define_language_info_` + docname_short + `_summary">` +
+
+								`<div class="accordion-body">` +
+									`<ul class="list-group">`
+										if (summarizer_classic_summary) {
+											html += `				
+												<li class="list-group-item">` +
+													`Классический реферат [Sentence extraction]: ` + 
+														`<p style="font-style: italic; margin: 0.5vh 0 0 0;">` + 
+															summarizer_classic_summary.join('. ') + `.` +
+														`</p>` +
+												`</li>`
+										}
+										if (summarizer_keywords_summary_result) {
+											html += `	
+												<li class="list-group-item">` + 
+													`Ключевые слова документа: ` + 
+														`<p style="font-style: italic; margin: 0.5vh 0 0 0;">` + 
+															summarizer_keywords_summary_result.join(', ') +
+														`</p>` +
+												`</li>` 
+										}
+										if (summarizer_keywords_summary_result) {
+											html += `	
+												<li class="list-group-item">` + 
+													`Реферат созданный при помощи ML: ` + 
+														`<p style="font-style: italic; margin: 0.5vh 0 0 0;">` + 
+															summarizer_ml_summary_result.join('. ') +  `.` +
+														`</p>` +
+												`</li>`
+										}
+		html += `				
+									</ul>` +
+								`</div>` +
+							`</div>` +
+						`</div>` +
+					`</div>`
+
+		// LANGUAGE DEFINITION INFO
+		//
+		let language_defined = (document_in_list.language_defined)
+		let by_ngramms_method = language_defined.by_ngramms_method
+		let by_alphabet_method = language_defined.by_alphabet_method
+		let by_neural_network_method = language_defined.by_neural_network_method
+		
+		if (!language_defined) {
+			language_defined = []
+		}
+
+		chapter_name_language_definintion = "Результат определения языка текста: "
+		html += `
+					<p class="card-text" style="margin: 1vh 0.4vh 1vh 0.4vh;">` +
+						chapter_name_language_definintion + 
 						languages[
 							Object.values(language_defined).reduce(
 							(a, b, _, arr) => (
@@ -209,37 +327,56 @@ function makeCardsFromResponsData() {
 							)
 						] + 
 					`</p>`+
-					`<div class="accordion" id="according_define_language_info_` + docname_short +`">` +
+					`<div class="accordion" id="according_define_language_info_` + docname_short + `_language_defined">` +
 						`<div class="accordion-item">` +
-							`<h2 class="accordion-header" id="heading_` + docname_short +`">` +
+							`<h2 class="accordion-header" id="heading_` + docname_short + `_language_defined">` +
 								
 								`<button class="accordion-button collapsed"` +
 									 	`type="button"` +
 										`data-bs-toggle="collapse"` +
-										`data-bs-target="#collapse_` + docname_short +`"` +
+										`data-bs-target="#collapse_` + docname_short + `_language_defined"` +
 										`aria-expanded="false"` +
-										`aria-controls="collapse_` + docname_short +`">` +
+										`aria-controls="collapse_` + docname_short + `_language_defined">` +
 									`Подробнее об определении языка текста` +
 								`</button>` +
 
 							`</h2>` +
 
-							`<div id="collapse_` + docname_short +`"` +
+							`<div id="collapse_` + docname_short + `_language_defined"` +
 								  `class="accordion-collapse collapse"` +
-								  `aria-labelledby="heading_` + docname_short +`"` +
-								  `data-bs-parent="#according_define_language_info_` + docname_short +`">` +
+								  `aria-labelledby="heading_` + docname_short + `_language_defined"` +
+								  `data-bs-parent="#according_define_language_info_` + docname_short + `_language_defined">` +
 
 								`<div class="accordion-body">` +
-									`<ul class="list-group">` + 
-										`<li class="list-group-item"> N-грамм метод: ` + languages[by_ngramms_method] + `</li>` +
-										`<li class="list-group-item"> Алфавитный метод: ` + languages[by_alphabet_method] + `</li>` +
-										`<li class="list-group-item"> Нейросетевой метод: ` + languages[by_neural_network_method] + `</li>` +
-									`</ul>` +
+									`<ul class="list-group">`
+										if (languages && by_ngramms_method && languages[by_ngramms_method]) {
+											html += `
+											<li class="list-group-item"> N-грамм метод: ` + 
+												`<i>` + languages[by_ngramms_method] + `</i>` + 
+											`</li>`
+										}
+										if (languages && by_alphabet_method && languages[by_alphabet_method]) {
+											html +=`
+											<li class="list-group-item"> Алфавитный метод: ` + 
+												`<i>` + languages[by_alphabet_method] + `</i>` +  
+											`</li>`
+										}
+										if (languages && by_neural_network_method && languages[by_neural_network_method]) {
+											html +=`
+											<li class="list-group-item"> Нейросетевой метод: ` + 
+												`<i>` + languages[by_neural_network_method] + `</i>` +  
+											`</li>`
+										}
+		html += `
+									</ul>` +
 								`</div>` +
 							`</div>` +
 						`</div>` +
-					`</div>` +
-				`</div>` +
+					`</div>`
+
+		// FINISH CARD CREATION 
+		html += `
+				</div>` +
 			`</div>`
 		cards.push(html)
 	}

@@ -292,17 +292,16 @@ class WebСrawler:
         try: language_defined_by_neural_network_method = self.language_definer_neural_network.define(html_document_without_tags)
         except: pass
     
-        
         # summarizers
         summarizer_classic_summary_result = []
         summarizer_keywords_summary_result = []
         summarizer_ml_summary_result = []
 
-        try: summarizer_classic_summary_result = self.summarizer_classic_summary.define(html_document_without_tags)
+        try: summarizer_classic_summary_result = self.summarizer_classic_summary.summarize(html_document_without_tags)
         except: pass
-        try: summarizer_keywords_summary_result = self.summarizer_keywords_summary.define(html_document_without_tags)
+        try: summarizer_keywords_summary_result = self.summarizer_keywords_summary.summarize(html_document_without_tags)
         except: pass
-        try: summarizer_ml_summary_result = self.summarizer_ml_summary.define(html_document_without_tags)
+        try: summarizer_ml_summary_result = self.summarizer_ml_summary.summarize(html_document_without_tags)
         except: pass
 
         search_image_document = {

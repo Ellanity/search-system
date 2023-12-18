@@ -64,7 +64,7 @@ class TextProcessor:
             char_num += 1
 
         tokens_with_inedexes = {}
-        # MAX_TOKEN_INDEX
+        
         for token in tokens:
             if len(token) > MAX_TOKEN_LENGTH :
                 token = token[:MAX_TOKEN_LENGTH]

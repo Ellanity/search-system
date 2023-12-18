@@ -44,8 +44,9 @@ class Searcher:
                     "document": document, 
                     "similarity": similarity,
                     "weights": vectors_documents[document],
-                    "language_defined": self.documets_search_images[document]["language_defined"]
-                    })
+                    "language_defined": self.documets_search_images[document]["language_defined"],
+                    "summarizers": self.documets_search_images[document]["summarizers"]
+                })
         
         return similarities_list
     
