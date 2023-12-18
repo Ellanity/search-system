@@ -50,7 +50,7 @@ class SummarizerClassicSummary(Summarizer):
         @staticmethod   
         def summarize(text: str) -> list:
             sentenses = []
-            sentenses.split(".")[:10]
+            sentenses = text.split(".")[:10]
             return sentenses
 
 class SummarizerKeywordsSummary(Summarizer):
@@ -61,7 +61,7 @@ class SummarizerKeywordsSummary(Summarizer):
         @staticmethod   
         def summarize(text: str) -> list:
             sentenses = []
-            sentenses.split(" ")[:10]
+            sentenses = text.split(" ")[:10]
             return sentenses
 
 class SummarizerMLSummary(Summarizer):
@@ -73,6 +73,6 @@ class SummarizerMLSummary(Summarizer):
         @staticmethod   
         def summarize(text: str) -> list:
             sentenses = []
-            sentenses.split(" ")[:10]
+            sentenses = text.split(" ")[:10]
             return sentenses
 

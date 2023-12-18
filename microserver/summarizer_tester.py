@@ -13,3 +13,4 @@ document_url = "documents/Engineering_ingegneria_informatica.html"
 
 html_text = tp.makeClearedTextFromHtmlDocument(document_url)
 
+print("done")

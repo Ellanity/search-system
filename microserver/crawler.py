@@ -286,11 +286,11 @@ class WebСrawler:
         language_defined_by_neural_network_method = ""
 
         try: language_defined_by_ngramms_method = self.language_definer_ngrams.define(html_document_without_tags)
-        except: pass
+        except Exception as ex: print(ex)
         try: language_defined_by_alphabet_method = self.language_definer_alphabet.define(html_document_without_tags)
-        except: pass
+        except Exception as ex: print(ex)
         try: language_defined_by_neural_network_method = self.language_definer_neural_network.define(html_document_without_tags)
-        except: pass
+        except Exception as ex: print(ex)
     
         # summarizers
         summarizer_classic_summary_result = []
@@ -298,11 +298,11 @@ class WebСrawler:
         summarizer_ml_summary_result = []
 
         try: summarizer_classic_summary_result = self.summarizer_classic_summary.summarize(html_document_without_tags)
-        except: pass
+        except Exception as ex: print(ex)
         try: summarizer_keywords_summary_result = self.summarizer_keywords_summary.summarize(html_document_without_tags)
-        except: pass
+        except Exception as ex: print(ex)
         try: summarizer_ml_summary_result = self.summarizer_ml_summary.summarize(html_document_without_tags)
-        except: pass
+        except Exception as ex: print(ex)
 
         search_image_document = {
             "count_of_words": len(list_of_lexems),

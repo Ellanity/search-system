@@ -5,6 +5,7 @@ from variables import *
 from text_processor import TextProcessor
 
 # work with files
+from documents_worker import DocumentsWorker
 import os   
 import stat
 import shutil
@@ -69,24 +70,13 @@ class Definer(object):
             is_exist = os.path.exists(path)
             if not is_exist:
                 os.makedirs(path)
-    
-    # just find documents in directory, return array of pathes 
-    # in path last part is filename 
-    @staticmethod
-    def __findDocumentsInDirectory(directory_url):
-        docpaths = []
-        for filename in os.listdir(directory_url):
-            filepath: str = os.path.join(directory_url, filename)
-            if os.path.isfile(filepath):
-                docpaths.append(filepath)
-        return docpaths
-    
+        
     # get source documents from dir, divided by language
     @staticmethod
     def _getSourcesDocumentsPaths() -> dict:
         documents_by_language = {} 
         for language in LANGUAGES_TO_DEFINE:
-            language_sources_documents_paths = Definer.__findDocumentsInDirectory(
+            language_sources_documents_paths = DocumentsWorker.getDocumentsPathesInDirectory(
                 os.path.join(Definer._paths["DOCUMENTS_FOR_DEFINER_SOURCES_DIRECTORY_URL"], language))
             documents_by_language[language] = language_sources_documents_paths
         return documents_by_language
@@ -96,10 +86,12 @@ class Definer(object):
     def _getProfilesDocumentsPaths(definition_type_str) -> dict:
         documents_by_language = {} 
         for language in LANGUAGES_TO_DEFINE:
-            language_sources_documents_paths = Definer.__findDocumentsInDirectory(
+            language_sources_documents_paths = DocumentsWorker.getDocumentsPathesInDirectory(
                 os.path.join(Definer._paths["DOCUMENTS_FOR_DEFINER_PROFILES_DIRECTORY_URL"], definition_type_str, language))
             
+            # language_sources_documents_paths = [(document_path + ".json") for document_path in language_sources_documents_paths] 
             documents_by_language[language] = language_sources_documents_paths
+
         return documents_by_language
             
     # remove source documents from dir, by type of definition
@@ -112,22 +104,8 @@ class Definer(object):
                 definition_type_str, 
                 language)
             
-            try:
-                if os.path.exists(language_sources_documents_paths):
-                    def onRmError(func, path, exc_info):
-                        # path contains the path of the file that couldn't be removed
-                        # let's just assume that it's read-only and unlink it.
-                        os.chmod(path, stat.S_IWRITE)
-                        os.unlink(path)
-                        os.remove(path)
-
-                shutil.rmtree(language_sources_documents_paths, onerror = onRmError)    
-                # os.remove(language_sources_documents_paths)
-            
-                if not os.path.exists(language_sources_documents_paths):
-                    os.makedirs(language_sources_documents_paths, stat.S_IWRITE)
-            except:
-                pass            
+            DocumentsWorker.removeDirectoryByPath(language_sources_documents_paths)
+            DocumentsWorker.createDirectoryByPath(language_sources_documents_paths)
         return 
 
 
@@ -205,7 +183,7 @@ class DefinerNGrammsMethod(Definer):
         for language in ngrams_profiles.keys():
             for document_in_lang in ngrams_profiles[language].keys():
                 # dict ngrams_profiles[language][document_in_lang]                
-                profiles_documents_path_full = os.path.join(ngrams_dir_name, definition_type_str, language, document_in_lang)
+                profiles_documents_path_full = os.path.join(ngrams_dir_name, definition_type_str, language, document_in_lang) + ".json"
                 ### write in file 
                 with codecs.open(profiles_documents_path_full, "w+", encoding="utf-8") as profile_file:
                     json.dump(ngrams_profiles[language][document_in_lang], profile_file)
@@ -247,7 +225,7 @@ class DefinerNGrammsMethod(Definer):
                     distance_measure = DefinerNGrammsMethod.__calculatingTheOutOfPlaceMeasureBetweenTwoProfiles(
                         ngram_profile, profile)
                     if nearest_document == {}:
-                        nearest_document = {"path":profile_path, "language":language,"profile":profile, "distance_measure":distance_measure}
+                        nearest_document = {"path":profile_path, "language":language, "profile":profile, "distance_measure":distance_measure}
                     else:
                         if nearest_document["distance_measure"] > distance_measure:
                             nearest_document = {"path": profile_path, "language": language, "profile": profile, "distance_measure":distance_measure}
@@ -266,6 +244,7 @@ class DefinerNGrammsMethod(Definer):
         print("ngram: ", nearest_document["language"])
         result = nearest_document["language"]
         return result
+
 
 class DefinerAlphabetMethod(Definer):
     def __init__(self, *args, **kwargs):
@@ -294,6 +273,7 @@ class DefinerAlphabetMethod(Definer):
         print("alph: ", result)
         return result
 
+
 # TODO: need to make CUDA GPU trainig
 # https://stackoverflow.com/questions/40690598/can-keras-with-tensorflow-backend-be-forced-to-use-cpu-or-gpu-at-will
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -307,6 +287,7 @@ from keras.utils import pad_sequences, to_categorical
 
 # for charts 
 import matplotlib.pyplot as plt
+
 
 # https://cloud.croc.ru/blog/about-technologies/keras-i-tensorflow-klassifikatsiya-teksta/
 class DefinerNeuralNetworkMethod(Definer):    

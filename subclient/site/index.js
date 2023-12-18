@@ -169,7 +169,8 @@ function makeCardsFromResponsData() {
 			<div class="card" style="margin: 2vh 0 1vw 1vw; z-index: 0; box-shadow: 2px 2px 1px rgba(0, 0, 0, .1);">` +
 				`<div class="card-body">` + 
 					`<h5 class="card-title">` + 
-						`<a href="` + document_url + `" class="card-link" target="_blank">` + document_id + ". " + docname_short + `</a>` + 
+						//`<a href="` + document_url + `" class="card-link" target="_blank">` + document_id + ". " + docname_short + `</a>` + 
+						`<a href="` + document_url + `" class="card-link" target="_blank">` + docname_short + `</a>` + 
 					`</h5>` 
 				
 		// SEARCH INFO
@@ -271,7 +272,7 @@ function makeCardsFromResponsData() {
 
 								`<div class="accordion-body">` +
 									`<ul class="list-group">`
-										if (summarizer_classic_summary) {
+										if (summarizer_classic_summary && summarizer_classic_summary.length > 0) {
 											html += `				
 												<li class="list-group-item">` +
 													`Классический реферат [Sentence extraction]: ` + 
@@ -280,7 +281,7 @@ function makeCardsFromResponsData() {
 														`</p>` +
 												`</li>`
 										}
-										if (summarizer_keywords_summary_result) {
+										if (summarizer_keywords_summary_result && summarizer_keywords_summary_result.length > 0) {
 											html += `	
 												<li class="list-group-item">` + 
 													`Ключевые слова документа: ` + 
@@ -289,7 +290,7 @@ function makeCardsFromResponsData() {
 														`</p>` +
 												`</li>` 
 										}
-										if (summarizer_keywords_summary_result) {
+										if (summarizer_ml_summary_result && summarizer_ml_summary_result.length > 0) {
 											html += `	
 												<li class="list-group-item">` + 
 													`Реферат созданный при помощи ML: ` + 
@@ -320,12 +321,14 @@ function makeCardsFromResponsData() {
 		html += `
 					<p class="card-text" style="margin: 1vh 0.4vh 1vh 0.4vh;">` +
 						chapter_name_language_definintion + 
+						`<i>` + 
 						languages[
 							Object.values(language_defined).reduce(
 							(a, b, _, arr) => (
 								arr.filter(v => v === a).length >= arr.filter(v => v === b).length ? a : b)
 							)
 						] + 
+						`</i>` +
 					`</p>`+
 					`<div class="accordion" id="according_define_language_info_` + docname_short + `_language_defined">` +
 						`<div class="accordion-item">` +
