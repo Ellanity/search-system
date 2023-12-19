@@ -51,16 +51,16 @@ class Definer(object):
         if not DELIMETERS_OF_TEXT: 
             raise Exception("Can not find variable DELIMETERS_OF_DOCUMENT")
 
-        Definer.__working_directory: str = WORKING_DIRECTORY if not None else os.getcwd()
+        Definer.working_directory: str = WORKING_DIRECTORY if not None else os.getcwd()
         
         # create a directories if not exist
         Definer._paths = {
-            "DOCUMENTS_DIRECTORY_URL": os.path.join(Definer.__working_directory, DOCUMENTS_DIRECTORY_URL),
-            "DOCUMENTS_FOR_DEFINER_SOURCES_DIRECTORY_URL": os.path.join(Definer.__working_directory, 
+            "DOCUMENTS_DIRECTORY_URL": os.path.join(Definer.working_directory, DOCUMENTS_DIRECTORY_URL),
+            "DOCUMENTS_FOR_DEFINER_SOURCES_DIRECTORY_URL": os.path.join(Definer.working_directory, 
                 DOCUMENTS_FOR_DEFINER_DIRECTORY_URL, DOCUMENTS_FOR_DEFINER_SOURCES_DIRECTORY_URL),
-            "DOCUMENTS_FOR_DEFINER_PROFILES_DIRECTORY_URL": os.path.join(Definer.__working_directory, 
+            "DOCUMENTS_FOR_DEFINER_PROFILES_DIRECTORY_URL": os.path.join(Definer.working_directory, 
                 DOCUMENTS_FOR_DEFINER_DIRECTORY_URL, DOCUMENTS_FOR_DEFINER_PROFILES_DIRECTORY_URL),
-            "NEURAL_NETWORK_DATA_DIRECTORY_URL": os.path.join(Definer.__working_directory, 
+            "NEURAL_NETWORK_DATA_DIRECTORY_URL": os.path.join(Definer.working_directory, 
                 DOCUMENTS_FOR_DEFINER_DIRECTORY_URL, NEURAL_NETWORK_DATA_DIRECTORY_URL)
         }
 

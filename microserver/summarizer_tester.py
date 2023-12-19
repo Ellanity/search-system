@@ -13,10 +13,22 @@ document_url = "documents/Алгоритм.html"
 
 html_text = tp.makeClearedTextFromHtmlDocument(document_url, True, True)
 
+# classic summary
+"""
 scs = SummarizerClassicSummary()
-# print(html_text)
-# print(scs.summarize(html_text))
 print(*scs.summarize(html_text), sep="\n")
+"""
+
+# words summary
+scs = SummarizerKeywordsSummary()
+print(*scs.summarize(html_text), sep="\n")
+
+
+# ml summary
+"""
+scs = SummarizerMLSummary()
+print(*scs.summarize(html_text), sep="\n")
+"""
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 print("done")

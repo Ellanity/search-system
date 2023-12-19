@@ -33,11 +33,11 @@ class Summarizer(object):
         if not DELIMETERS_OF_TEXT: 
             raise Exception("Can not find variable DELIMETERS_OF_DOCUMENT")
 
-        Summarizer.__working_directory: str = WORKING_DIRECTORY if not None else os.getcwd()
+        Summarizer.working_directory: str = WORKING_DIRECTORY if not None else os.getcwd()
         
         # create a directories if not exist
         Summarizer._paths = {
-            "DOCUMENTS_DIRECTORY_URL": os.path.join(Summarizer.__working_directory, DOCUMENTS_DIRECTORY_URL)
+            "DOCUMENTS_DIRECTORY_URL": os.path.join(Summarizer.working_directory, DOCUMENTS_DIRECTORY_URL)
         }
 
         for _, path in Summarizer._paths.items():
@@ -133,8 +133,8 @@ class SummarizerClassicSummary(Summarizer):
 
         @staticmethod   
         def summarize(text: str) -> list:
-             
-            tokenized_text = TextProcessor.tokenizeTextByParagraphs(text=text)
+            cleared_text = TextProcessor.makeClearedTextFromRawHtmlText(text, True, True)
+            tokenized_text = TextProcessor.tokenizeTextByParagraphs(text=cleared_text)
             result = SummarizerClassicSummary.sentenceExtraction(tokenized_text)
             print("sentence extraction: done")
             return result
@@ -146,8 +146,18 @@ class SummarizerKeywordsSummary(Summarizer):
             
         @staticmethod   
         def summarize(text: str) -> list:
-            sentenses = []
-            sentenses = text.split(" ")[:10]
+            # cleared_text = TextProcessor.makeClearedTextFromHtmlDocument(text, True, True)
+            # sentenses = []
+            # for sentence_index in range(len(sentenses)):
+            #    if len(sentenses[sentence_index]) < 3:
+            #         sentenses.pop(sentence_index) 
+
+            cleared_text = TextProcessor.makeClearedTextFromRawHtmlText(text, True, True)
+            tokens = list(TextProcessor.tokenizeTextByWords(text=cleared_text))
+
+            sentenses = tokens[1:11]
+            
+            print("keywords: done")
             return sentenses
 
 class SummarizerMLSummary(Summarizer):
@@ -158,7 +168,170 @@ class SummarizerMLSummary(Summarizer):
         
         @staticmethod   
         def summarize(text: str) -> list:
-            sentenses = []
-            sentenses = text.split(" ")[:10]
-            return sentenses
+            luhn = LuhnSummarizer() #verbose=True)
+            summary = luhn(text, 3)
+
+            print("ml summary: done")
+            return [summary]
+
+from collections import Counter
+
+class LuhnSummarizer:
+    """
+    Метод Луна.
+    Статья: https://habr.com/ru/articles/595517/
+    Исходник: https://colab.research.google.com/drive/1qeENj0BKdlhrNrPzUFnCpS1EE4l0qrJq#scrollTo=maEg_cazJ082
+    
+    Основано на https://github.com/miso-belica/sumy/blob/main/sumy/summarizers/luhn.py
+    Оригинальная статья: https://courses.ischool.berkeley.edu/i256/f06/papers/luhn58.pdf
+    """
+    
+    """
+    @staticmethod
+    def sentenize(text):
+        paragraphs = TextProcessor.tokenizeTextByParagraphs(text=text)
+        sentences = list()
+        for paragraph in paragraphs:
+            sentences.extend(paragraph) 
+        return sentences
+    """
+
+    def __init__(
+        self,
+        significant_percentage = 0.7, # 70% самых частотных токенов мы считаем значимыми.
+        min_token_freq = 1, # Кроме того, слова должны встречаться минимум 1 раз.
+        max_gap_size = 6, # Максимальное количество подряд идущих незначимых токенов в промежутках.
+        # verbose = False # Отладочный вывод для наглядности.
+    ):
+        self.significant_percentage = significant_percentage
+        self.min_token_freq = min_token_freq
+        self.max_gap_size = max_gap_size
+        self.chunk_ending_mask = [0] * self.max_gap_size
+        # self.verbose = verbose
+
+    def __call__(self, text, target_sentences_count):
+        # Считаем значимые токены.
+        all_significant_tokens = self._getSignificantTokens(text)
+        # if self.verbose:
+        #     print("Значимые токены: ", all_significant_tokens)
+
+        sentences = TextProcessor.tokenizeTextBySentences(text)
+
+        # Считаем значимости предложений.
+        ratings = []
+        for sentence_index, sentence in enumerate(sentences):
+            # Значимость предложений - максимум из значимостей промежутков.
+            sentence_rating = max(self._getChunkRatings(sentence, all_significant_tokens))
+            # if self.verbose:
+            #     print("\tПРЕДЛОЖЕНИЕ. Значимость: {}, текст: {}".format(sentence_rating, sentence))
+            ratings.append((sentence_rating, sentence_index))
+
+        # Сортируем предложения по значимости.
+        ratings.sort(reverse=True)
+
+        # Оставляем топовые и собираем реферат.
+        ratings = ratings[:target_sentences_count]
+        indices = [index for _, index in ratings]
+        indices.sort()
+
+        return " ".join([sentences[index] for index in indices])
+
+    """
+    def __tokenizeSentenceLocal(sentence):
+        sentence = sentence.strip().replace("\xa0", "")
+        BAD_POS = ("PREP", "NPRO", "CONJ", "PRCL", "NUMR", "PRED", "INTJ", "PUNCT", "CCONJ", "ADP", "DET", "ADV")
+        tokens = [token.lemma_ for token in spacy_model(sentence) if token.pos_ not in BAD_POS]
+        tokens = [token for token in tokens if len(token) > 2]
+        return tokens
+    """
+
+    """
+    def __tokenizeTextLocal(sentence):
+        all_tokens = []
+        for sentence in sentenize(text):
+            all_tokens.extend(tokenize_sentence(sentence))
+        return all_tokens
+    """
+    
+    def _getSignificantTokens(self, text):
+        """ Метод для подсчёта того, какие токены являются значимыми. """
+        ### var 1 
+        # tokens_counter = Counter(tokenize_text(text))
+        ###
+
+        ### var 2
+        tokens_with_indexes = TextProcessor.tokenizeTextByWords(text)
+        tokens = list(tokens_with_indexes)
+        tokens_counter = Counter(tokens)
+        ### 
+        significant_tokens_max_count = int(len(tokens_counter) * self.significant_percentage)
+        significant_tokens = tokens_counter.most_common(significant_tokens_max_count)
+        significant_tokens = {token for token, cnt in significant_tokens if cnt >= self.min_token_freq}
+        
+        return significant_tokens
+
+    def _getChunkRatings(self, sentence, significant_tokens):
+        """ Разбиваем предложение на промежтуки и считаем их значимости. """
+
+        # tokens = LuhnSummarizer.__tokenizeSentenceLocal(sentence)
+        tokens_with_indexes = TextProcessor.tokenizeTextByWords(sentence)
+        tokens = list(tokens_with_indexes)
+
+        chunks, masks = [], []
+        in_chunk = False
+
+        for token in tokens:
+            is_significant_token = token in significant_tokens
+            
+            if is_significant_token and not in_chunk:
+                in_chunk = True
+                masks.append([int(is_significant_token)])
+                chunks.append([token])
+            elif in_chunk:
+                last_mask = masks[-1]
+                last_mask.append(int(is_significant_token))
+                last_chunk = chunks[-1]
+                last_chunk.append(token)
+            if not chunks:
+                continue
+
+            # Проверяем на наличие 4 подряд идущих незначимых токенов.
+            # Если встретили - завершаем промежуток.
+            last_chunk_ending_mask = masks[-1][-self.max_gap_size:]
+            if last_chunk_ending_mask == self.chunk_ending_mask:
+                in_chunk = False
+        
+        ratings = []
+        for chunk, mask in zip(chunks, masks):
+            rating = self._getChunkRating(mask, chunk)
+            ratings.append(rating)
+
+        if len(ratings) == 0: 
+            ratings.append(0.0)
+
+        return ratings
+
+    def _getChunkRating(self, original_mask, chunk): 
+        """ Подсчёт значимости одного промежутка """
+
+        # Убираем незначимые токены в конце промежутка
+        original_mask = "".join(map(str, original_mask))
+        mask = original_mask.rstrip("0")
+
+        end_index = original_mask.rfind("1") + 1
+        chunk = chunk[:end_index]
+        assert len(mask) == len(chunk)
+        chunk = " ".join(chunk)
+
+        # Считаем значимость
+        words_count = len(mask)
+        assert words_count > 0
+        significant_words_count = mask.count("1")
+        assert significant_words_count > 0
+
+        rating = significant_words_count * significant_words_count / words_count
+        # if self.verbose:
+        #     print("ПРОМЕЖУТОК. Значимость: {}, маска: {}, текст: {}".format(rating, mask, chunk))
+        
+        return rating
 

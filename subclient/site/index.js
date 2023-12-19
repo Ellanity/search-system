@@ -293,9 +293,9 @@ function makeCardsFromResponsData() {
 										if (summarizer_ml_summary_result && summarizer_ml_summary_result.length > 0) {
 											html += `	
 												<li class="list-group-item">` + 
-													`Реферат созданный при помощи ML: ` + 
+													`Реферат созданный при помощи ML (Метод Луна): ` + 
 														`<p style="font-style: italic; margin: 0.5vh 0 0 0;">` + 
-															summarizer_ml_summary_result.join('. ') +  `.` +
+															summarizer_ml_summary_result.join('. ') + 
 														`</p>` +
 												`</li>`
 										}

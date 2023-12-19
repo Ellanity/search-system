@@ -37,6 +37,9 @@ MAX_TOKEN_INDEX = int(((MAX_TOKEN_LENGTH + 1) / 2) * MAX_TOKEN_LENGTH * len(ALLO
 # # # # # num of neurons on input layer
 MAX_NUM_OF_TOKENS_IN_INPUT_SEQUENCE_FOR_NN = 50 
 
+# Summarizers
+COUNT_OF_SENTENCES_TO_RETURN = 10
+
 # Analyzer
 SERVER_DICTIONARY_DIRECTORY_URL="server_dictionary"
 

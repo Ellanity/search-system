@@ -22,17 +22,15 @@ class TextProcessor:
             raise Exception("Can not find variable MAX_TOKEN_LENGTH")
         
     @staticmethod
+    def keepCharactersInStringWithRegex(input_string, reference_string):
+        pattern = f"[^{reference_string.lower()}]"
+        filtered_string = re.sub(pattern, "", input_string.lower())
+        return filtered_string.lower()
         
+    @staticmethod
     def makeClearedTextFromRawHtmlText(html_raw: str, 
                                        save_sentences: bool = False, 
                                        save_paragraphs: bool = False) -> str:
-        def keepCharactersInStringWithRegex(input_string, reference_string):
-            pattern = f"[^{reference_string.lower()}]"
-            filtered_string = re.sub(pattern, "", input_string.lower())
-            return filtered_string.lower()
-
-        # + "\n.?!"
-
         # remove tags and newlines from raw text
         pattern = re.compile('<.*?>')
         html_document_without_tags = re.sub(pattern, ' ', html_raw)
@@ -46,7 +44,7 @@ class TextProcessor:
         # if not save_paragraphs:
         #     html_document_without_tags.replace('\n', ' ')
 
-        text_from_document_re = keepCharactersInStringWithRegex(
+        text_from_document_re = TextProcessor.keepCharactersInStringWithRegex(
             input_string=html_document_without_tags,
             reference_string=allowed_dict_prepared)
 
@@ -70,16 +68,21 @@ class TextProcessor:
             with codecs.open(current_path, "r", encoding="utf-8") as file:
                 html_document_with_tags = file.read()
                         
-        text_from_document_re = TextProcessor.makeClearedTextFromRawHtmlText(html_document_with_tags, 
-                                                                             save_sentences, 
-                                                                             save_paragraphs)
-        return text_from_document_re
+        text_from_document_re = TextProcessor.makeClearedTextFromRawHtmlText(
+            html_document_with_tags, 
+            save_sentences, 
+            save_paragraphs)
         
+        return text_from_document_re
     
     @staticmethod
     def tokenizeTextByWords(text: str) -> dict:
+
+        text = TextProcessor.keepCharactersInStringWithRegex(
+            input_string=text, 
+            reference_string=ALLOWED_DICTIONARY)
+        
         tokens = word_tokenize(text)
-        # print(tokens.word_index)
         
         chars_nums_dict = {}
         char_num = 1
@@ -120,6 +123,14 @@ class TextProcessor:
                 paragraphs_to_return.append([])
 
         return paragraphs_to_return[:len(paragraphs_to_return) - 1]
+    
+    @staticmethod
+    def tokenizeTextBySentences(text: str) -> dict :
+        paragraphs = TextProcessor.tokenizeTextByParagraphs(text=text)
+        sentences = list()
+        for paragraph in paragraphs:
+            sentences.extend(paragraph) 
+        return sentences
 
 
 
@@ -127,7 +138,7 @@ class TextProcessor:
 ########################################################################## Variant 1
 import re
 
-def keepCharactersInStringWithRegex(input_string, reference_string):
+def TextProcessor.keepCharactersInStringWithRegex(input_string, reference_string):
     pattern = f"[^{reference_string.lower()}]"
     filtered_string = re.sub(pattern, "", input_string.lower())
     return filtered_string.lower()
@@ -135,7 +146,7 @@ def keepCharactersInStringWithRegex(input_string, reference_string):
 # remove tags and newlines from raw text
 pattern = re.compile('<.*?>')
 html_document_without_tags = re.sub(pattern, ' ', html_document_with_tags)
-text_from_document_re = keepCharactersInStringWithRegex(
+text_from_document_re = TextProcessor.keepCharactersInStringWithRegex(
     input_string=html_document_without_tags.replace('\n', ' '),
     reference_string=ALLOWED_DICTIONARY)
 
