@@ -7,8 +7,6 @@ from text_processor import TextProcessor
 # work with files
 from documents_worker import DocumentsWorker
 import os   
-import stat
-import shutil
 import json
 import codecs
 
@@ -308,7 +306,7 @@ class DefinerNeuralNetworkMethod(Definer):
         def defineTextLanguage(text: str) -> str:
             # create input data for prediction
             text = TextProcessor.makeClearedTextFromRawHtmlText(text)
-            tokens_with_indexes = DefinerNeuralNetworkMethod.NeuralNetwork.tokenizeText(text)
+            tokens_with_indexes = DefinerNeuralNetworkMethod.NeuralNetwork.tokenizeTextByWords(text)
             
             sequences: list = []
             sequences.append(list())
@@ -373,8 +371,8 @@ class DefinerNeuralNetworkMethod(Definer):
             return ""
 
         @staticmethod           
-        def tokenizeText(text: str) -> dict:
-            tokens = TextProcessor.tokenizeText(text)
+        def tokenizeTextByWords(text: str) -> dict:
+            tokens = TextProcessor.tokenizeTextByWords(text)
             
             def normilizeTokens(tokens: dict) -> dict:
                 for token in tokens.keys():
@@ -432,7 +430,7 @@ class DefinerNeuralNetworkMethod(Definer):
                     html_text = TextProcessor.makeClearedTextFromRawHtmlText(html_document_with_tags)
                     
                     list_of_indexes_from_text = \
-                        list(DefinerNeuralNetworkMethod.NeuralNetwork.tokenizeText(html_text).values())
+                        list(DefinerNeuralNetworkMethod.NeuralNetwork.tokenizeTextByWords(html_text).values())
                     
                     # split text by max_len_of_input
                     count_of_tokens_in_current_list = 0

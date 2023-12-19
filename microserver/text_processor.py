@@ -1,6 +1,6 @@
 from variables import *
 
-from nltk.tokenize import word_tokenize 
+from nltk.tokenize import sent_tokenize, word_tokenize 
 
 import re
 import os
@@ -22,38 +22,62 @@ class TextProcessor:
             raise Exception("Can not find variable MAX_TOKEN_LENGTH")
         
     @staticmethod
-    def makeClearedTextFromRawHtmlText(html_raw: str) -> str:
         
+    def makeClearedTextFromRawHtmlText(html_raw: str, 
+                                       save_sentences: bool = False, 
+                                       save_paragraphs: bool = False) -> str:
         def keepCharactersInStringWithRegex(input_string, reference_string):
             pattern = f"[^{reference_string.lower()}]"
             filtered_string = re.sub(pattern, "", input_string.lower())
             return filtered_string.lower()
 
+        # + "\n.?!"
+
         # remove tags and newlines from raw text
         pattern = re.compile('<.*?>')
         html_document_without_tags = re.sub(pattern, ' ', html_raw)
+
+        allowed_dict_prepared = ALLOWED_DICTIONARY
+        if save_sentences:
+            allowed_dict_prepared += ".!?"
+        if save_paragraphs:
+            allowed_dict_prepared += "\n"
+        
+        # if not save_paragraphs:
+        #     html_document_without_tags.replace('\n', ' ')
+
         text_from_document_re = keepCharactersInStringWithRegex(
-            input_string=html_document_without_tags.replace('\n', ' '),
-            reference_string=ALLOWED_DICTIONARY)
+            input_string=html_document_without_tags,
+            reference_string=allowed_dict_prepared)
 
         text_from_document_re = re.sub(" +", " ", text_from_document_re)
+        
+        if save_paragraphs:
+            text_from_document_re = re.sub("\n | \n", "\n", text_from_document_re)
+            text_from_document_re = re.sub("\n+", ".\n", text_from_document_re)
+            text_from_document_re = re.sub("\.+", ".", text_from_document_re)
 
         return text_from_document_re
     
     @staticmethod
-    def makeClearedTextFromHtmlDocument(html_path: str) -> str:
+    def makeClearedTextFromHtmlDocument(html_path: str, 
+                                        save_sentences: bool = False, 
+                                        save_paragraphs: bool = False) -> str:
         html_document_with_tags=""
         current_path: str = os.path.join(WORKING_DIRECTORY, html_path)
 
         if os.path.isfile(current_path):
             with codecs.open(current_path, "r", encoding="utf-8") as file:
                 html_document_with_tags = file.read()
-                
-        text_from_document_re = TextProcessor.makeClearedTextFromRawHtmlText(html_document_with_tags)
+                        
+        text_from_document_re = TextProcessor.makeClearedTextFromRawHtmlText(html_document_with_tags, 
+                                                                             save_sentences, 
+                                                                             save_paragraphs)
         return text_from_document_re
+        
     
     @staticmethod
-    def tokenizeText(text: str) -> dict:
+    def tokenizeTextByWords(text: str) -> dict:
         tokens = word_tokenize(text)
         # print(tokens.word_index)
         
@@ -78,6 +102,25 @@ class TextProcessor:
             tokens_with_inedexes[token] = index
             
         return tokens_with_inedexes
+    
+    @staticmethod
+    def tokenizeTextByParagraphs(text: str) -> dict :\
+    
+        paragraphs_to_return = list()
+        paragraphs_to_return.append([])
+        paragraphs = text.split("\n")
+        # print(*paragraphs[:6], sep="\n\n\n\n\n\n")
+        for paragraph in paragraphs:
+            sentences = sent_tokenize(paragraph)
+            for sentence in sentences:
+                if len(sentence.split(" ")) <= 3:
+                    continue
+                paragraphs_to_return[-1].append(sentence.replace("\n", " "))
+            if len(paragraphs_to_return[-1]) > 0:
+                paragraphs_to_return.append([])
+
+        return paragraphs_to_return[:len(paragraphs_to_return) - 1]
+
 
 
 """ Variant 1

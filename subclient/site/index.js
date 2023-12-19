@@ -277,7 +277,7 @@ function makeCardsFromResponsData() {
 												<li class="list-group-item">` +
 													`Классический реферат [Sentence extraction]: ` + 
 														`<p style="font-style: italic; margin: 0.5vh 0 0 0;">` + 
-															summarizer_classic_summary.join('. ') + `.` +
+															summarizer_classic_summary.join(' ') +
 														`</p>` +
 												`</li>`
 										}

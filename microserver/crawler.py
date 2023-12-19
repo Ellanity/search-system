@@ -70,6 +70,7 @@ class WebСrawler:
         self.current_state = self.possible_states[0]
         
     def __update_state(self, state):
+        print("Crawler state: ", self.current_state, "...")
         self.current_state = self.possible_states[state]
     
     def __init_system_variables__(self):
