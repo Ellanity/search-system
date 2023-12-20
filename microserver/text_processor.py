@@ -30,7 +30,8 @@ class TextProcessor:
     @staticmethod
     def makeClearedTextFromRawHtmlText(html_raw: str, 
                                        save_sentences: bool = False, 
-                                       save_paragraphs: bool = False) -> str:
+                                       save_paragraphs: bool = False, 
+                                       save_commas: bool = False) -> str:
         # remove tags and newlines from raw text
         pattern = re.compile('<.*?>')
         html_document_without_tags = re.sub(pattern, ' ', html_raw)
@@ -40,6 +41,8 @@ class TextProcessor:
             allowed_dict_prepared += ".!?"
         if save_paragraphs:
             allowed_dict_prepared += "\n"
+        if save_commas:
+            allowed_dict_prepared += ",;"
         
         # if not save_paragraphs:
         #     html_document_without_tags.replace('\n', ' ')
@@ -60,7 +63,8 @@ class TextProcessor:
     @staticmethod
     def makeClearedTextFromHtmlDocument(html_path: str, 
                                         save_sentences: bool = False, 
-                                        save_paragraphs: bool = False) -> str:
+                                        save_paragraphs: bool = False, 
+                                        save_commas: bool = False) -> str:
         html_document_with_tags=""
         current_path: str = os.path.join(WORKING_DIRECTORY, html_path)
 
@@ -71,7 +75,8 @@ class TextProcessor:
         text_from_document_re = TextProcessor.makeClearedTextFromRawHtmlText(
             html_document_with_tags, 
             save_sentences, 
-            save_paragraphs)
+            save_paragraphs, 
+            save_commas)
         
         return text_from_document_re
     

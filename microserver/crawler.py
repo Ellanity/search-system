@@ -293,14 +293,21 @@ class WebСrawler:
         try: language_defined_by_neural_network_method = self.language_definer_neural_network.define(html_document_without_tags)
         except Exception as ex: print(ex)
     
+        language = ""
+        try: 
+            languages = [language_defined_by_ngramms_method, language_defined_by_alphabet_method, language_defined_by_neural_network_method]
+            language = max(set(languages), key = languages.count)
+        except Exception as ex: print(ex)
+
         # summarizers
         summarizer_classic_summary_result = []
         summarizer_keywords_summary_result = []
         summarizer_ml_summary_result = []
 
+
         try: summarizer_classic_summary_result = self.summarizer_classic_summary.summarize(html_document_without_tags)
         except Exception as ex: print(ex)
-        try: summarizer_keywords_summary_result = self.summarizer_keywords_summary.summarize(html_document_without_tags)
+        try: summarizer_keywords_summary_result = self.summarizer_keywords_summary.summarize(html_document_without_tags, language)
         except Exception as ex: print(ex)
         try: summarizer_ml_summary_result = self.summarizer_ml_summary.summarize(html_document_without_tags)
         except Exception as ex: print(ex)

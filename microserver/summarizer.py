@@ -5,11 +5,7 @@ from variables import *
 from text_processor import TextProcessor
 
 # work with files
-import os   
-import stat
-import shutil
-import json
-import codecs
+import os
 
 class Summarizer(object):
     
@@ -135,9 +131,17 @@ class SummarizerClassicSummary(Summarizer):
         def summarize(text: str) -> list:
             cleared_text = TextProcessor.makeClearedTextFromRawHtmlText(text, True, True)
             tokenized_text = TextProcessor.tokenizeTextByParagraphs(text=cleared_text)
-            result = SummarizerClassicSummary.sentenceExtraction(tokenized_text)
+            sentences = SummarizerClassicSummary.sentenceExtraction(tokenized_text)
+            
             print("sentence extraction: done")
-            return result
+            return list(sentences)
+
+
+import spacy
+# https://github.com/talmago/spacy_ke
+# https://spacy.io/models/it (it_core_news_lg)
+# https://spacy.io/models/ru (ru_core_news_lg)
+import spacy_ke
 
 class SummarizerKeywordsSummary(Summarizer):
     
@@ -145,20 +149,21 @@ class SummarizerKeywordsSummary(Summarizer):
             super().__init__(*args, **kwargs)
             
         @staticmethod   
-        def summarize(text: str) -> list:
-            # cleared_text = TextProcessor.makeClearedTextFromHtmlDocument(text, True, True)
-            # sentenses = []
-            # for sentence_index in range(len(sentenses)):
-            #    if len(sentenses[sentence_index]) < 3:
-            #         sentenses.pop(sentence_index) 
-
-            cleared_text = TextProcessor.makeClearedTextFromRawHtmlText(text, True, True)
-            tokens = list(TextProcessor.tokenizeTextByWords(text=cleared_text))
-
-            sentenses = tokens[1:11]
+        def summarize(text: str, language) -> list:
             
+            result = []
+            cleared_text = TextProcessor.makeClearedTextFromRawHtmlText(text, True, True, True)
+            try:
+                nlp = spacy.load(language + "_core_news_lg")
+                nlp.add_pipe("yake")
+                doc = nlp(cleared_text)
+
+                for keyword, score in doc._.extract_keywords(n=15):
+                    result.append(f"{keyword}")
+            except Exception as ex:
+                print(ex) 
             print("keywords: done")
-            return sentenses
+            return list(result)
 
 class SummarizerMLSummary(Summarizer):
     
@@ -169,10 +174,12 @@ class SummarizerMLSummary(Summarizer):
         @staticmethod   
         def summarize(text: str) -> list:
             luhn = LuhnSummarizer() #verbose=True)
-            summary = luhn(text, 3)
+            result = list()
+            result.extend([luhn(text=text, 
+                                target_sentences_count=3)])
 
             print("ml summary: done")
-            return [summary]
+            return list(result)
 
 from collections import Counter
 
