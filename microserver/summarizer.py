@@ -82,9 +82,9 @@ class SummarizerClassicSummary(Summarizer):
                     count_of_symbols_before_in_paragraph = paragraphs[paragraph_index]["paragraph"][sentence_index]["count_of_symbols_before_in_paragraph"]
                     count_of_symbols_in_paragraph = paragraphs[paragraph_index]["count_of_symbols_in_paragraph"]
 
-                    Posd = 1 - (count_of_symbols_before_in_doc / count_of_symbols_in_doc)
-                    Posp = 1 - (count_of_symbols_before_in_paragraph / count_of_symbols_in_paragraph)
-                    sentence_weight = Posd * Posp
+                    Pos_document = 1 - (count_of_symbols_before_in_doc / count_of_symbols_in_doc)
+                    Pos_paragraph = 1 - (count_of_symbols_before_in_paragraph / count_of_symbols_in_paragraph)
+                    sentence_weight = Pos_document * Pos_paragraph
 
                     paragraphs[paragraph_index]["paragraph"][sentence_index]["sentence_weight"] = sentence_weight
                     
@@ -165,6 +165,7 @@ class SummarizerKeywordsSummary(Summarizer):
             print("keywords: done")
             return list(result)
 
+
 class SummarizerMLSummary(Summarizer):
     
         def __init__(self, *args, **kwargs):
@@ -181,6 +182,11 @@ class SummarizerMLSummary(Summarizer):
             print("ml summary: done")
             return list(result)
 
+
+# https://pypi.org/project/sumy/
+# need to add one more summaryzation
+
+
 from collections import Counter
 
 class LuhnSummarizer:
@@ -188,6 +194,7 @@ class LuhnSummarizer:
     Метод Луна.
     Статья: https://habr.com/ru/articles/595517/
     Исходник: https://colab.research.google.com/drive/1qeENj0BKdlhrNrPzUFnCpS1EE4l0qrJq#scrollTo=maEg_cazJ082
+
     
     Основано на https://github.com/miso-belica/sumy/blob/main/sumy/summarizers/luhn.py
     Оригинальная статья: https://courses.ischool.berkeley.edu/i256/f06/papers/luhn58.pdf

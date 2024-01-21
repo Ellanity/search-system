@@ -1,3 +1,35 @@
+################################################################################
+# A crawler is used to index files. It finds all files in a given directory.   #
+# It also receives data from the database about recorded documents. Next, he   #
+# makes up three lists of documents: add – documents that are not in the       # 
+# database but are in the directory, they need to be added, readd – documents  # 
+# that are both in the database and in the directory, they need to be updated  # 
+# if a specified amount of time has passed, delete – documents that are        # 
+# recorded in the database, but which are not in the directories, data about   # 
+# such documents must be deleted from the system.                              # 
+#                                                                              # 
+# After that, the crawler creates search images for all selected documents and # 
+# writes them to temporary files. In order to create a search image, it is     # 
+# required to split the document into tokens. After the search images are      # 
+# created for all documents, the crawler begins to change the server           # 
+# dictionary, checking all created lists of documents. If the document is in   # 
+# the list to be added, then the number of documents and the number of words   # 
+# are added to the general dictionary information (common_information),        # 
+# otherwise the same values are reduced.  Also, if the document is in the list # 
+# for addition, then the crawler adds new tokens from the document to all      # 
+# parts of the dictionary. Or, if the token already exists in the dictionary,  # 
+# the crawler adds to the entry about the token the number of words themselves # 
+# and the number of documents in which these words are used. If the document   # 
+# is in the list for deletion, the described values decrease, and if any of    # 
+# them becomes zero (they must simultaneously become zeros), then the token is # 
+# deleted from the dictionary. For documents that need to be updated, the      # 
+# system first deletes everything according to their old images, and then adds # 
+# everything again based on the new ones. After the server dictionary is       # 
+# updated, the crawler works with the database and moves the created search    # 
+# images of documents from the temporary folder to the folder with all         # 
+# the images of the microserver.                                               # 
+################################################################################
+
 # custom modules
 from database import DatabaseDocuments
 
